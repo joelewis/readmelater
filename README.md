@@ -3,7 +3,7 @@ Bookmark with a snooze button. Bookmark, buffer and complete your reading list.
 
 
 ## Manifesto
-A good bookmark service should help me do two things: 
+A good bookmark service should help at two things: 
 1.  I've read something. I don't want to lose it.  
 2.  I've don't have the time to read something at the moment. I want to buffer it and come back to it later.
 
