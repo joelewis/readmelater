@@ -26,7 +26,7 @@ Here's one version of a bookmarking service that I envison:
 + Most important of all, it shouldn't make me guilty of having a huge list of pending lists.  
 
 
-This project is one initiative on that direction. Most of the above can be acheived a frictionless authentication layer and a very light browser extension and a server process for metrics calculation and sending reminders. 
+This project is one initiative on that direction. Most of the above can be acheived with an authentication layer and a very light browser extension and a server process for metrics calculation and sending reminders. 
 
 
 
