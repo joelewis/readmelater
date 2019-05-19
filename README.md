@@ -4,8 +4,8 @@ Bookmark with a snooze button. Bookmark, buffer and complete your reading list.
 
 ## Manifesto
 A good bookmark service should help me do two things: 
-1.  I've read something over the internet. I'm pretty sure I will need it at a later point of time, so I want a place to dump links that I don't want to forget. 
-2.  I've come across something interesting, but I don't have the time to read it entirely right now. I want to dump it somewhere and come back to it later when I find time.
+1.  I've read something. I don't want to lose it.  
+2.  I've don't have the time to read something at the moment. I want to buffer it and come back to it later.
 
 While most bookmark services are good at #1, most suck at #2. A good bookmark service should help me complete my reading list than just being a dumb bucket. It should have three basic properties:
 
