@@ -1,5 +1,6 @@
 {
   "name": "readmelater",
+  "type": "module",
   "version": "1.0.0",
   "description": "Reading list with reminders",
   "main": "index.js",
