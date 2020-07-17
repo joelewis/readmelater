@@ -32,3 +32,10 @@ This project is one initiative on that direction. Most of the above can be achei
 
 
 
+## Setup
+
+1. clone repo
+2. `npm install`
+3. `DEBUG="*" npx prisma migrate save --name init --experimental` to setup tables in a sqlite db. Configure .env file to use different a database.
+
+

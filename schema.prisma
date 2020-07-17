@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource sqlite {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+  // url = "file:./data.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model Link {
+  id        Int      @default(autoincrement()) @id
+  createdAt DateTime @default(now())
+  href      String
+  readingTime String
+}
+
+model Tag {
+  id        Int      @default(autoincrement()) @id
+  tag String
+  links Link[]
+}
+
+model User {
+  id      Int      @default(autoincrement()) @id
+  email   String   @unique
+  name    String?
+  links   Link[]
+  createdAt DateTime @default(now())
+  password String
+}
+
+model GoogleUser {
+  id      Int      @default(autoincrement()) @id
+  user    User @relation(fields: [userId], references: [id])
+  userId  Int
+  access_token  String?
+  refresh_token  String?
+  guserId  String
+}
