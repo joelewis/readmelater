@@ -17,6 +17,8 @@ model Link {
   createdAt DateTime @default(now())
   href      String
   readingTime String
+  user      User     @relation(fields: [userId], references: [id])
+  userId  Int
 }
 
 model Tag {
@@ -29,9 +31,7 @@ model User {
   id      Int      @default(autoincrement()) @id
   email   String   @unique
   name    String?
-  links   Link[]
   createdAt DateTime @default(now())
-  password String
 }
 
 model GoogleUser {
