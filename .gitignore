@@ -5,6 +5,7 @@ __pycache__/
 
 node_modules
 data.db
+public/**
 
 # C extensions
 *.so
