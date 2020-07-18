@@ -38,6 +38,8 @@ This project is one initiative on that direction. Most of the above can be achei
 2. `npm install`
 3. `DEBUG="*" npx prisma migrate save --name init --experimental` to setup migration scripts. 
 4. `DEBUG="*" npx prisma migrate up --experimental` to create the tables. Configure .env file to use different a database.
+5. `cd client && yarn build` to build client side files and push into public folder.
+6. `node index.js` to run the server
 
 
 
