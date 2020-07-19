@@ -195,7 +195,7 @@ app.get('/token',
     res.json({token: token});
   })
 
-app.get('/data',
+app.get('/session',
   ensureAuthAPI,
   function(req, res) {
     res.json(req.user);
