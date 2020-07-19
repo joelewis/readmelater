@@ -17,8 +17,8 @@ var JWTstrategy = PassportJwt.Strategy;
 var ExtractJwt = PassportJwt.ExtractJwt;
 
 // import from env
-const GOOGLE_CLIENT_ID = '877323248885-3lf5c6ms7crannivpombjdbqh5lqbtrp.apps.googleusercontent.com';
-const GOOGLE_CLIENT_SECRET = 'WyizCq6jvb8HMHp-RkfnZgIt';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID; 
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 var GoogleStrategy = PassportGoogleOauth.OAuth2Strategy;
 
