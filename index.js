@@ -10,6 +10,7 @@ import bodyParser from "body-parser";
 import PrismaClient from '@prisma/client'
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use(session({ secret: "cats" })); // import from env
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors())
 
 var getUserByEmail = async (email) => {
   return await prisma.user.findOne({
@@ -158,6 +160,9 @@ app.get('/logout', function(req, res){
 //   will redirect the user back to this application at /auth/google/callback
 app.get('/auth/google', (req, res, next) => {
   // detect if login attempt comes from extension, if so get extension url and redirect to it with the jwt token
+  if (req.query.from_extension) {
+    req.session.from_extension = req.query.from_extension;
+  }
   passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile'] })(req, res, next)
 });
 
@@ -172,17 +177,21 @@ app.get('/auth/google/callback',
     const redirect = req.session.returnTo;
     delete req.session.returnTo;
 
-    if (req.session.extension_url) {
+    if (req.session.from_extension) {
+      var extension_url = `chrome-extension://${req.session.from_extension}/login.html`
+      delete req.session.from_extension
       // redirect to extension's url with jwt token in get param
-      res.redirect(req.session.extention_url || '/?token=' + jwt.sign({id: req.user.id}, jwtSecret, {expiresIn: '7d'}));
+      res.redirect(extension_url + '?token=' + jwt.sign({id: req.user.id}, jwtSecret, {expiresIn: 2000}));
+    } else {
+      res.redirect(redirect || '/');
     }
-    res.redirect(redirect || '/');
+    
 });
 
 app.get('/token',
   ensureAuthAPI,
   function(req, res) {
-    var token = jwt.sign({id: req.user.id}, jwtSecret, {expiresIn: '7d'});
+    var token = jwt.sign({id: req.user.id}, jwtSecret, {expiresIn: 2000});
     res.json({token: token});
   })
 
@@ -191,6 +200,10 @@ app.get('/data',
   function(req, res) {
     res.json(req.user);
   });
+
+app.post('/bookmark', ensureAuthAPI, function(req, res) {
+  res.json(req.user);
+});
 
 
 // render home page

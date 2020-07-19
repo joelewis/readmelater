@@ -1,0 +1,17 @@
+{
+    "name": "Close Tabs",
+    "description" : "Close your tabs with confidence. This extension will periodically remind you about your pending reading-list.",
+    "version": "1.0",
+    "manifest_version": 2,
+    "browser_action": {
+        "default_popup": "bookmark.html",
+        "default_icon": "hello_extensions.png"
+    },
+    "permissions": [
+        "storage",
+        "tabs"
+    ],
+    "web_accessible_resources": [
+        "login.html"
+    ]
+}
