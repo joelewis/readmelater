@@ -181,7 +181,7 @@ app.get('/auth/google/callback',
       var extension_url = `chrome-extension://${req.session.from_extension}/login.html`
       delete req.session.from_extension
       // redirect to extension's url with jwt token in get param
-      res.redirect(extension_url + '?token=' + jwt.sign({id: req.user.id}, jwtSecret, {expiresIn: 2000}));
+      res.redirect(extension_url + '?token=' + jwt.sign({id: req.user.id}, jwtSecret, {expiresIn: '7d'}));
     } else {
       res.redirect(redirect || '/');
     }
@@ -191,7 +191,7 @@ app.get('/auth/google/callback',
 app.get('/token',
   ensureAuthAPI,
   function(req, res) {
-    var token = jwt.sign({id: req.user.id}, jwtSecret, {expiresIn: 2000});
+    var token = jwt.sign({id: req.user.id}, jwtSecret, {expiresIn: '7d'});
     res.json({token: token});
   })
 
