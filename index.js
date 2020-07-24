@@ -202,7 +202,33 @@ app.get('/session',
   });
 
 app.post('/bookmark', ensureAuthAPI, function(req, res) {
+  
+  var href = req.body.href;
+  var timeout = req.body.timeout;
+  var tags = req.body.tags;
+
+  var link = {
+    href: href
+  }
+  
+
   res.json(req.user);
+});
+
+app.post('/stopemails', ensureAuth, function(req, res) {
+  if (req.body.type === 'user') {
+    // stop all email notifications for all links for user
+  } else if (req.body.type === 'link') {
+    var links = req.body.links;
+    // stop email notifications for these links
+  } else if (req.body.type === 'tag') {
+    var tag = req.body.tag;
+    // stop email notifications for all links under this tag
+  }
+});
+
+app.get('/links', ensureAuthAPI, function(req, res) {
+  // fetch all links for the user
 });
 
 
