@@ -210,7 +210,7 @@ app.post('/bookmark', ensureAuthAPI, function(req, res) {
   var link = {
     href: href
   }
-  
+
 
   res.json(req.user);
 });
@@ -237,4 +237,4 @@ app.get('/*', async (req, res) => {
   res.sendFile(path.join( __dirname + '/public/index.html'));
 })
 
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
+app.listen(port, '0.0.0.0', () => console.log(`Example app listening at http://localhost:${port}`))
