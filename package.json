@@ -28,7 +28,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "deletedb": "rm data.db",
-    "migrate": ""
+    "initmigrate": "DEBUG=\"*\" npx prisma migrate save --experimental",
+    "migrate": "DEBUG=\"*\" npx prisma migrate up --experimental",
+    "generate": "npx prisma generate"
   },
   "repository": {
     "type": "git",

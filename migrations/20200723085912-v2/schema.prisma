@@ -3,8 +3,8 @@
 
 datasource sqlite {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
-  // url = "file:./data.db"
+  url = "***"
+  // url = "***"
 }
 
 generator client {
@@ -16,7 +16,7 @@ model Link {
   id        Int      @default(autoincrement()) @id
   createdAt DateTime @default(now())
   href      String
-  readingTime String?
+  readingTime String
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
   tags      Tag[]
