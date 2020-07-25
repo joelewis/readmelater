@@ -12,6 +12,8 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import * as u from './utils.js';
+// Load the AWS SDK for Node.js
+import AWS from 'aws-sdk';
 
 dotenv.config();
 
@@ -234,6 +236,11 @@ app.get('/links', ensureAuthAPI, function(req, res) {
   // fetch all links for the user
 });
 
+app.get('/sendmail', (req, res) => {
+  
+  u.sendMails();
+  res.json({success: true})
+})
 
 // render home page
 app.get('/*', async (req, res) => {
