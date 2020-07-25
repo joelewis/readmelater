@@ -15,19 +15,21 @@ generator client {
 model Link {
   id        Int      @default(autoincrement()) @id
   createdAt DateTime @default(now())
-  href      String
+  href      String   @@id
   readingTime String?
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
   tags      Tag[]
   timeout   String?
   notify    Boolean  @default(true)
+
+  @@unique([userId, href])
 }
 
 model Tag {
   id        Int      @default(autoincrement()) @id
   tag       String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id]) @@unique()
   notify    Boolean  @default(true)
   userId    Int
 }

@@ -17,8 +17,55 @@ export const getUserById = async (id) => {
   });
 };
 
+export const getTag = async (user, tag) => {
+    return await prisma.user.findOne({
+        where: {
+          userId: user.id,
+          tag: tag
+        }
+    });
+}
+
+export const createTag = async (user, tag) => {
+    return await prisma.user.create({
+        data: {
+          tag: tag,
+          user: {
+              connect: {
+                  id: user.id
+              }
+          }
+        }
+    });
+}
+
+export const getLinkByHref = async (user, href) => {
+    return await prisma.link.findOne({
+        where: {
+            user: user,
+            href: href
+        }
+    })
+}
+
+export const addTags2Link = async (link, tags) => {
+    return await prisma.link.update({
+        where: { id: link.id },
+        data: {
+            tags: tags
+        }
+    })
+}
+
 export const addLink = async (user, href, timeout, tags) => {
-    return await prisma.link.create({
+    
+    var tagIds = tags.map(async tag => {
+        var t = await getTag(user, tag) || await createTag(user, tag)
+    })
+
+    console.log(tagIds)
+
+    var link = await getLinkByHref(user, href) || await prisma.link.create({
         data: {
             user: {
                 connect: {
@@ -26,10 +73,12 @@ export const addLink = async (user, href, timeout, tags) => {
                 }
             },
             href: href,
-            timeout: timeout,
-            // tags: tags
+            timeout: timeout
         }
     })
+
+    return await addTags2Link(link, tagIds);
+
 }
 
 export const timeNow2Date = function(keyString) { // key = 'xd, xw, xm'

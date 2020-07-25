@@ -202,9 +202,9 @@ app.post('/bookmark', ensureAuthAPI, function(req, res) {
 
   var tags = req.body.tags || [];
 
-  u.addLink(req.user, href, timeout, tags);
+  var link = u.addLink(req.user, href, timeout, tags);
   
-  res.json(req.user);
+  res.json(link);
 });
 
 app.post('/stopemails', ensureAuth, function(req, res) {
