@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="css/vendor/bootstrap.css">
+    <link rel="stylesheet/less" type="text/css" href="less/index.less" />
+    <title></title>
+  </head>
+  <body class="ct-popup-wrapper">
+
+    <div id="app">
+      <top-bar></top-bar>
+      
+      <template v-if="!isLoggedIn">
+        <div class="ct-social-login-buttons">
+          <a 
+            class="btn btn-primary btn-google" 
+            :href="`http://localhost:3000/auth/google?from_extension=${chromeRunTimeId}`"
+            target="_blank"
+            >
+            <img src="img/social-icons/google.png" class="img-responsive" />
+            Login with Google
+          </a>
+
+          <a 
+            class="btn btn-primary btn-twitter" 
+            href="#"
+            target="_blank"
+            >
+            <img src="img/social-icons/twitter.png" class="img-responsive" />
+            Login with Twitter
+          </a>
+
+        </div>
+      </template>
+
+      <template v-else>
+        <div class="ct-bookmark-status-card success">
+          <div class="icon-wrapper">
+            <span class="material-icons">check</span>
+          </div>
+          <h6>Current page is bookmarked!</h6>
+        </div>
+
+        <!-- <div class="ct-bookmark-status-card error">
+          <div class="icon-wrapper">
+            <span class="material-icons">close</span>
+          </div>
+          <h6>Bookmarked exist</h6>
+        </div> -->
+
+        <ul class="ct-options">
+          <li @click="signOut">Log out</li>
+        </ul>
+      </template>
+
+    </div>
+    
+    <script src="js/vendor/jquery.min.js"></script>
+    <script src="js/vendor/popper.min.js"></script>
+    <script src="js/vendor/bootstrap.min.js"></script>
+    <script src="js/vendor/less.js"></script>
+    <script src="js/vendor/vue.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
