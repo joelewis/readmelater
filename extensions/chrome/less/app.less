@@ -1,0 +1,120 @@
+.ct-popup-wrapper {
+    margin: 0;
+    overflow: hidden;
+    width: 348px;
+}
+
+.img-responsive {
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+#app {
+    margin: 0;
+    overflow: hidden;
+    // min-height: 200px;
+}
+
+nav {
+    background-color: #f5f5ff;
+    height: 56px;
+    padding-top: 8px;
+    padding-left: 16px;
+    line-height: 19px;
+    padding-bottom: 8px;
+
+    img {
+        margin-top: 4px;
+    }
+}
+
+.ct-social-login-buttons {
+    padding: 16px;
+
+    a {
+        box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
+        display: block;
+        margin-bottom: 16px;
+        text-align: left;
+        padding: 8px;
+
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+
+        img {
+            width: 32px;
+            margin-right: 8px;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        &.btn-google, &.btn-google:active, &.btn-google:focus  {
+            background-color: #fff !important;
+            border-color: #fff !important;
+            color: #333 !important;
+        }
+
+        &.btn-twitter {
+            background-color: #1DA1F2;
+            border-color: #1DA1F2;
+        }
+    }
+}
+
+.ct-bookmark-status-card {
+    text-align: center;
+    padding: 16px;
+
+    .icon-wrapper {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin: auto;
+        margin-bottom: 8px;
+
+        span {
+            color: #fff;
+            font-size: 32px;
+            margin-top: 4px;
+        }
+    }
+
+    &.success {
+        .icon-wrapper {
+            background-color: #25C16F;
+        }
+    }
+
+    &.error {
+        .icon-wrapper {
+            background-color: #e74c3c;
+        }
+    }
+
+    h6 {
+        color: #323439;
+    }
+}
+
+.ct-options {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    // temporary
+    text-align: center;
+
+    li {
+        padding: 12px 16px;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        color: #adadb0;
+        cursor: pointer;
+        font-size: 13px;
+
+        &:hover {
+            color: #323439;
+        }
+    }
+}
