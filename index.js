@@ -189,8 +189,6 @@ app.get('/session',
 
 
 app.post('/bookmark', ensureAuthAPI, function(req, res) {
-  
-  console.log(req.body);
   var href = req.body.href;
   if (!href) {
     return res.status(400).json({error: "missing href"})
@@ -205,9 +203,19 @@ app.post('/bookmark', ensureAuthAPI, function(req, res) {
 
   var tags = req.body.tags || [];
 
-  u.addLink(req.user, href, timeout, tags);
+  var link = u.addLink(req.user, href, timeout, tags);
   
-  res.json(req.user);
+  res.json(link);
+});
+
+app.get('/is/bookmarked', ensureAuthAPI, async function(req, res) {
+  var href = req.query.href;
+  var link = href ? await u.getLinkByHref(req.user, href) : null;
+  if (link) {
+    return res.json(link);
+  } else {
+    return res.status(404).send();
+  }
 });
 
 app.post('/stopemails', ensureAuth, function(req, res) {
