@@ -11,6 +11,7 @@ import PrismaClient from '@prisma/client'
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import * as u from './utils.js';
 
 dotenv.config();
 
@@ -32,25 +33,12 @@ const jwtSecret = "cats"; // import from env
 
 app.use(session({ secret: "cats" })); // import from env
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors())
 
-var getUserByEmail = async (email) => {
-  return await prisma.user.findOne({
-    where: {
-        email: email
-    }
-  });
-};
 
-var getUserById = async (id) => {
-  return await prisma.user.findOne({
-    where: {
-        id: id
-    }
-  });
-};
 
 
 // google oauth handling
@@ -67,7 +55,7 @@ passport.use('google', new GoogleStrategy({
     var email = profile._json.email;
     var name = profile._json.name;
     // find user or create user with email obtained from google
-    const user = await getUserByEmail(email);
+    const user = await u.getUserByEmail(email);
 
     if (user) {
         return done(null, user);
@@ -95,7 +83,7 @@ passport.use(
   'jwt',
   new JWTstrategy(opts, async (jwt_payload, done) => {
     try {
-      const user = await getUserById(jwt_payload.id);
+      const user = await u.getUserById(jwt_payload.id);
       if (user) { 
         return done(null, user) 
       } else {
@@ -129,7 +117,7 @@ passport.serializeUser(function(user, done) {
 
 passport.deserializeUser(async function(id, done) {
   try {
-    const user = await prisma.user.findOne({where: {id: id}});
+    const user = await u.getUserById(id);
     done(null, user)
   } catch(e) {
     done(e);
@@ -139,11 +127,6 @@ passport.deserializeUser(async function(id, done) {
 
 app.use('/static', express.static('public'))
 
-// const main = async () => {
-//     const allUsers = await prisma.user.findMany()
-//     console.log(allUsers)
-// }
-// main()
 
 
 app.get('/logout', function(req, res){
@@ -201,17 +184,26 @@ app.get('/session',
     res.json(req.user);
   });
 
+
 app.post('/bookmark', ensureAuthAPI, function(req, res) {
   
+  console.log(req.body);
   var href = req.body.href;
-  var timeout = req.body.timeout;
-  var tags = req.body.tags;
-
-  var link = {
-    href: href
+  if (!href) {
+    return res.status(400).json({error: "missing href"})
   }
 
+  var timeout = req.body.timeout;
+  if (!timeout) {
+    timeout = u.timeNow2Date('2w'); // segt default time out of 2 weeks
+  } else {
+    timeout = u.timeNow2Date(timeout); // convert timeout to date format
+  }
 
+  var tags = req.body.tags || [];
+
+  u.addLink(req.user, href, timeout, tags);
+  
   res.json(req.user);
 });
 
@@ -236,5 +228,9 @@ app.get('/links', ensureAuthAPI, function(req, res) {
 app.get('/*', async (req, res) => {
   res.sendFile(path.join( __dirname + '/public/index.html'));
 })
+
+// start cron job
+
+
 
 app.listen(port, '0.0.0.0', () => console.log(`Example app listening at http://localhost:${port}`))
