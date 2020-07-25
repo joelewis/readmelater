@@ -3,8 +3,8 @@
 
 datasource sqlite {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
-  // url = "file:./data.db"
+  url = "***"
+  // url = "***"
 }
 
 generator client {
@@ -19,8 +19,8 @@ model Link {
   readingTime String?
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
-  tags      Tag[]    @relation(references: [id])
-  timeout   DateTime
+  tags      Tag[]
+  timeout   String?
   notify    Boolean  @default(true)
 
   @@unique([userId, href])
@@ -32,7 +32,6 @@ model Tag {
   user      User     @relation(fields: [userId], references: [id])
   notify    Boolean  @default(true)
   userId    Int
-  posts     Link[]   @relation(references: [id])
 
   @@unique([userId, tag])
 }

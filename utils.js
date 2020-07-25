@@ -18,16 +18,18 @@ export const getUserById = async (id) => {
 };
 
 export const getTag = async (user, tag) => {
-    return await prisma.user.findOne({
+    return await prisma.tag.findOne({
         where: {
-          userId: user.id,
-          tag: tag
+          userId_tag: {
+              userId: user.id,
+              tag: tag
+          }
         }
     });
 }
 
 export const createTag = async (user, tag) => {
-    return await prisma.user.create({
+    return await prisma.tag.create({
         data: {
           tag: tag,
           user: {
@@ -42,28 +44,33 @@ export const createTag = async (user, tag) => {
 export const getLinkByHref = async (user, href) => {
     return await prisma.link.findOne({
         where: {
-            user: user,
-            href: href
+            userId_href: {
+                userId: user.id,
+                href: href
+            }
         }
     })
 }
 
-export const addTags2Link = async (link, tags) => {
+export const setTags2Link = async (link, tags) => {
     return await prisma.link.update({
         where: { id: link.id },
         data: {
-            tags: tags
+            tags: {
+                set: tags.map(t => {
+                    return {id: t.id}
+                })
+            }
         }
     })
 }
 
 export const addLink = async (user, href, timeout, tags) => {
     
-    var tagIds = tags.map(async tag => {
-        var t = await getTag(user, tag) || await createTag(user, tag)
-    })
-
-    console.log(tagIds)
+    var tags = await Promise.all(tags.map(async tag => {
+        var t =  await getTag(user, tag) || await createTag(user, tag)
+        return t;
+    }))
 
     var link = await getLinkByHref(user, href) || await prisma.link.create({
         data: {
@@ -77,7 +84,7 @@ export const addLink = async (user, href, timeout, tags) => {
         }
     })
 
-    return await addTags2Link(link, tagIds);
+    return await setTags2Link(link, tags);
 
 }
 
