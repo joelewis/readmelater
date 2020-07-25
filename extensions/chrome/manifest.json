@@ -5,8 +5,13 @@
     "manifest_version": 2,
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "browser_action": {
+        "default_title": "CloseTab",
         "default_popup": "index.html",
         "default_icon": "hello_extensions.png"
+    },
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
     },
     "permissions": [
         "storage",
