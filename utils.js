@@ -165,7 +165,6 @@ export const mail = async (from, to, subject, text, html) => {
         // Create the promise and SES service object
         var sendPromise = await new AWS.SES({apiVersion: '2010-12-01'}).sendEmail(params).promise();
     } catch (err) {
-        // function(err) {
         console.error(err, err.stack);
     }
 

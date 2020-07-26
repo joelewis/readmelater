@@ -52,7 +52,7 @@
               </div>
 
               <div class="q-pt-lg">
-                <h2 class="text-weight-regular text-red-9"> Smarter Bookmarking </h2>
+                <h2 class="text-red-9"> Smarter Bookmarking </h2>
                 <p>
                   Most people bookmark links for coming back later. But most of us lack the disclipline to actually come back.
                 <!-- </p>
@@ -65,7 +65,7 @@
               </div>
 
               <div class="q-pt-lg">
-                <h2 class="text-weight-regular"> Weekly Emails</h2>
+                <h2 class=""> Weekly Emails</h2>
                 <p>
                   Most people bookmark links for coming back later. But most of us lack the disclipline to actually come back.
                 <!-- </p>
@@ -78,7 +78,7 @@
               </div>
 
               <div class="q-pt-lg">
-                <h2 class="text-weight-regular text-red-9">Time Outs &amp; Tags</h2>
+                <h2 class="text-red-9">Time Outs &amp; Tags</h2>
                 <p>
                   Most people bookmark links for coming back later. But most of us lack the disclipline to actually come back.
                 <!-- </p>
