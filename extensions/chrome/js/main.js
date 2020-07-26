@@ -1,3 +1,11 @@
+function BookmarkObj() {
+    return {
+        href: '',
+        timeout: '1w',
+        tags: []
+    }
+}
+
 Vue.component('top-bar', {
     template: `
         <nav>
@@ -10,8 +18,12 @@ var app = new Vue({
     el: '#app',
     
     data: {
+        loader: false,
         isLoggedIn: false,
-        chromeRunTimeId: chrome.runtime.id
+        chromeRunTimeId: chrome.runtime.id,
+        tag: '',
+        tags: [],
+        bookmark: BookmarkObj()
     },
 
     beforeCreate: function() {
@@ -19,15 +31,18 @@ var app = new Vue({
         // Check whether user has logged in or not
         chrome.storage.local.get('jwt', function(data) {
             if(data.jwt) {
-                self.isLoggedIn = true
-            } else {
-                self.isLoggedIn = false   
+                // Get the current Tab URL
+                // Send it to the server to bookmark
+                // -> URL exist already or not, show it in badges itself
+                chrome.windows.getCurrent(function(w) {
+                    chrome.tabs.getSelected(w.id,
+                    function (response){
+                        self.bookmark.href = response.url
+                        self.saveBookmark(self.bookmark, data.jwt);
+                    });
+                });
             }
         })
-
-        // Get the current Tab URL
-        // Send it to the server to bookmark
-        // -> URL exist already or not, show it in badges itself
     },
 
     methods: {
@@ -36,6 +51,40 @@ var app = new Vue({
             // store and showing the loggin screen   
             chrome.storage.local.remove('jwt');
             this.isLoggedIn = false
+        },
+
+        updateBookmarkTags: function(tags) {
+            this.bookmark.tags = tags.map(tag => {
+                return tag.text
+            })
+
+            this.updateBookmark()
+        },
+
+        updateBookmark: function() {
+            var self = this
+            chrome.storage.local.get('jwt', function(data) {
+                if(data.jwt) {
+                    self.saveBookmark(self.bookmark, data.jwt);
+                }
+            })
+        },
+
+        saveBookmark: function(bookmark, jwt) {
+            var self = this
+            postJSON('http://localhost:3000/bookmark', bookmark , {'Authorization': 'Bearer ' + jwt }).then(function(r) {
+                if (r.status === 200) {
+                    // show bookmark success
+                    r.json().then(json => {
+                        self.isLoggedIn = true    
+                    })
+                } else if (r.statue === 401){
+                    // show logged out ui
+                    self.isLoggedIn = false                    
+                } else {
+                    // show error ui
+                }
+            })
         }
     }
 })
