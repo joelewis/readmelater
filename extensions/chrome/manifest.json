@@ -6,8 +6,7 @@
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "browser_action": {
         "default_title": "CloseTab",
-        "default_popup": "index.html",
-        "default_icon": "hello_extensions.png"
+        "default_popup": "index.html"
     },
     "background": {
         "scripts": ["background.js"],

@@ -61,6 +61,10 @@ nav {
             background-color: #1DA1F2;
             border-color: #1DA1F2;
         }
+
+        &:hover {
+            opacity: 0.8;
+        }
     }
 }
 
@@ -116,5 +120,72 @@ nav {
         &:hover {
             color: #323439;
         }
+    }
+}
+
+.vue-tags-input {
+    .ti-input {
+        width: 100%;
+        // height: calc(2.25rem + 2px);
+        padding: .375rem 1.75rem .375rem .75rem;
+        line-height: 1.5;
+        color: #495057;
+        vertical-align: middle;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+}
+
+.update-bookmark-section {
+    padding: 16px;
+}
+
+// CSS Loader 
+.ct-loader {
+    padding: 16px;
+}
+
+.lds-ring {
+    display: inline-block;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    margin: auto;
+}
+
+.lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    margin: 2px;
+    border: 2px solid #c62828;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #c62828 transparent transparent transparent;
+}
+  
+.lds-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+}
+  
+.lds-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+}
+  
+.lds-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+}
+  
+@keyframes lds-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
     }
 }
