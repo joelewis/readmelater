@@ -211,8 +211,11 @@ app.post('/bookmark', ensureAuthAPI, function(req, res) {
 });
 
 app.get('/is/bookmarked', ensureAuthAPI, async function(req, res) {
-  var href = req.query.href;
+  var href = decodeURIComponent(req.query.href); 
   var link = href ? await u.getLinkByHref(req.user, href) : null;
+
+  console.log(link, href)
+
   if (link) {
     return res.json(link);
   } else {
