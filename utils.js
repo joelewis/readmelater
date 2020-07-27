@@ -98,6 +98,8 @@ export const addLink = async (user, href, timeout, tags) => {
     }))
 
     var link = await getLinkByHref(user, href);
+
+    console.log(link);
     if (!link) { // if link is not present create everything
         await prisma.link.create({
             data: {
@@ -111,7 +113,8 @@ export const addLink = async (user, href, timeout, tags) => {
             }
         })
     } else { // if link is already bookmarked just update timeout and tags
-        prisma.link.update({
+        console.log(`updating timeout value for link: ${link.id} as timeout: ${timeout}`)
+        await prisma.link.update({
             where: {id: link.id},
             data: {
                 timeout: timeout
@@ -186,14 +189,14 @@ export const mail = async (from, to, subject, text, html) => {
     
     try {
         // Create the promise and SES service object
-        var sendPromise = await new AWS.SES({apiVersion: '2010-12-01'}).sendEmail(params).promise();
+        var data = await new AWS.SES({apiVersion: '2010-12-01'}).sendEmail(params).promise();
+        console.log('mail-sent for: ', to);
+        return data;
     } catch (err) {
         console.error(err, err.stack);
+        return {};
     }
 
-    console.log('EMAIL SENT!!!')
-    
-    return sendPromise;
     // Handle promise's fulfilled/rejected states
 }
 
@@ -252,11 +255,18 @@ export const sendMails = async () => {
             return l;
         })
 
+        if (!links.length) {
+            console.log('no links to send emails to: ' + user.email);
+            return; // no links to send email for
+        }
+
         var html = await hbs.render('./emailtemplates/weekly_reminder.html', {
             name: user.name,
             links: links,
             unsubscribeLinkToken: jwt.sign(user.id, process.env.SECRET)
         })
+
+        
 
         var text = await hbs.render('./emailtemplates/weekly_reminder.txt', {
             name: user.name,
@@ -264,16 +274,33 @@ export const sendMails = async () => {
             unsubscribeLinkToken: jwt.sign(user.id, process.env.SECRET)
         })
 
+        console.log(text)
 
-        console.log(user.email)
         // send email to users
-        mail(
+        var result = mail(
             "digest@closetab.email",
             user.email,
             "CloseTab.email - stuff to read this week.",
             text,
             html
         )
+
+        if (result.MessageId) {
+            // record mail delivery
+            await prisma.emailLog.create({
+                data: {
+                    user: {
+                        connect: {
+                            id: user.id
+                        }
+                    },
+                    html: html,
+                    text: text,
+                    mailId: result.MessageId
+                }
+            })
+        }
+
     })
 }
 
