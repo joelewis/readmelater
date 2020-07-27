@@ -20,12 +20,9 @@ dotenv.config();
 var JWTstrategy = PassportJwt.Strategy;
 var ExtractJwt = PassportJwt.ExtractJwt;
 
-// import from env
-// const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID; 
-// const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
-const GOOGLE_CLIENT_ID="877323248885-3lf5c6ms7crannivpombjdbqh5lqbtrp.apps.googleusercontent.com" 
-const GOOGLE_CLIENT_SECRET="WyizCq6jvb8HMHp-RkfnZgIt"
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID; 
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 var GoogleStrategy = PassportGoogleOauth.OAuth2Strategy;
 
@@ -34,9 +31,9 @@ const __dirname = dirname(__filename);
 const prisma = new PrismaClient.PrismaClient();
 const app = express()
 const port = process.env.PORT || 3000 // import from env
-const jwtSecret = "cats"; // import from env
+const jwtSecret = process.env.SECRET; // import from env
 
-app.use(session({ secret: "cats" })); // import from env
+app.use(session({ secret: process.env.SECRET })); // import from env
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(passport.initialize());
@@ -236,8 +233,30 @@ app.get('/links', ensureAuthAPI, function(req, res) {
   // fetch all links for the user
 });
 
-app.get('/sendmail', (req, res) => {
-  
+app.get('/open/:linktoken', async (req, res) => {
+  var linktoken =  req.params.linktoken;
+  var linkId = jwt.decode(linktoken, jwtSecret);
+  try {
+    var link = await u.getLinkById(linkId);
+    await u.markLinkAsRead(linkId);
+    res.redirect(link.href);
+  } catch (e) {
+    res.status(404).send();
+  }
+});
+
+app.get('/unsubscribe/:token', async (req, res) => {
+  var token = req.params.token;
+  var userId = jwt.decode(token, jwtSecret);
+  try {
+    await u.stopMailsForUser(userId);
+  }  catch (e) {
+    // notify user that unsubscription failed
+  }
+  res.redirect('/unsubscribed')
+});
+
+app.get('/sendmail', async (req, res) => {
   u.sendMails();
   res.json({success: true})
 })

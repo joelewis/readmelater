@@ -1,6 +1,10 @@
 import PrismaClient from '@prisma/client'
-const prisma = new PrismaClient.PrismaClient();
+import exphbs from 'express-handlebars';
 import AWS from 'aws-sdk';
+import jwt from 'jsonwebtoken';
+
+const hbs = exphbs.create({});
+const prisma = new PrismaClient.PrismaClient();
 AWS.config.update({region: 'us-east-2'});
 
 export const getUserByEmail = async (email) => {
@@ -50,6 +54,25 @@ export const getLinkByHref = async (user, href) => {
                 userId: user.id,
                 href: href
             }
+        }
+    })
+}
+
+export const getLinkById = async (id) => {
+    return await prisma.link.findOne({
+        where: {
+            id: id
+        }
+    })
+}
+
+export const markLinkAsRead = async (id) => {
+    return await prisma.link.update({
+        where: {
+            id: id
+        },
+        data: {
+            notify: false
         }
     })
 }
@@ -174,6 +197,22 @@ export const mail = async (from, to, subject, text, html) => {
     // Handle promise's fulfilled/rejected states
 }
 
+export const getRemainingDays = (futureDate) => {
+    const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+    return Math.round(Math.abs((new Date() - futureDate) / oneDay));
+}
+
+export const stopMailsForUser = async (id) => {
+    return await prisma.user.update({
+        where: {
+            id: id
+        },
+        data: {
+            notify: false
+        }
+    })
+}
+
 export const sendMails = async () => {
     // fetch users
     // for each user
@@ -205,18 +244,37 @@ export const sendMails = async () => {
         })
 
         links = links.filter(l => {
-            console.log(l.tags);
             return l.tags.length === 0 || l.tags.filter(t => t.notify).length // atleast one tag with notify = true
+        }).map(l => {
+            l.closeTabLink = "http://closetab.email/open/" + jwt.sign(l.id, process.env.SECRET)
+            l.remainingDays = getRemainingDays(new Date(l.timeout))
+            l.isTagged = l.tags.length > 0
+            return l;
         })
-        
-        // console.log(links)
+
+        var html = await hbs.render('./emailtemplates/weekly_reminder.html', {
+            name: user.name,
+            links: links,
+            unsubscribeLinkToken: jwt.sign(user.id, process.env.SECRET)
+        })
+
+        var text = await hbs.render('./emailtemplates/weekly_reminder.txt', {
+            name: user.name,
+            links: links,
+            unsubscribeLinkToken: jwt.sign(user.id, process.env.SECRET)
+        })
+
+
+        console.log(user.email)
         // send email to users
         mail(
-            
+            "digest@closetab.email",
+            user.email,
+            "CloseTab.email - stuff to read this week.",
+            text,
+            html
         )
     })
-
-    // Create sendEmail params 
 }
 
 

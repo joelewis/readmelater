@@ -1,0 +1,21 @@
+Hello {{ name }},
+<br>
+
+<p>This is a weekly reminder email from closetab.email to help you finish your reading list.<br>
+Here's the list of links you've been meaning to read through this week.</p>
+
+{{#each links}}
+<p>
+<a href="{{closeTabLink}}">{{href}}<a> <br>
+{{remainingDays}} day(s) left <br>
+{{#if isTagged}}{{#each tags}}<a href="#">#{{tag}}</a>{{#if @last}}&nbsp;{{else}},&nbsp;{{/if}}{{/each}}{{/if}}
+{{/each}}
+
+
+<p>Happy reading!</p>
+
+<br>
+<p>To stop receiving these emails <a href="http://closetab.email/unsubscribe/{{unsubscribeLinkToken}}">click here</a>.</p>
+<p>You can also stop emails for a tag or a link by <a href="http://closetab.email/configure/email">configuring your email settings.</a></p>
+
+

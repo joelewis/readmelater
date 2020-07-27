@@ -24,6 +24,10 @@
       </q-toolbar>
     </q-header>
 
+    <!-- <q-footer class="q-mt-lg">
+      <p> Made with love from Madras </p>
+    </q-footer> -->
+
     <q-page-container>
         <q-page>
         <div class="row">
@@ -90,8 +94,22 @@
                 </p>
               </div>
 
+              <div class="q-pt-lg q-pb-lg">
+                <h2 class="text-red-9">Pricing</h2>
+                <p>
+                  While these features will be free, we are still figuring out a pricing model to sustain the project.
+                  We are working on several premium features like Pocket integration, more intuitive reminders with reading time estimates and auto-planning to complete readings per #tag.
+                  Please register your preference.
+                </p>
+                <div>  
+                  <q-btn class="q-ml-lg" unelevated rounded color="red" label="I'm ready pay a small fee for advanced features" />
+                  <q-btn class="q-ml-lg" unelevated rounded color="light-blue-14" label="I'm better off with the basic features" />
+              </div>
+              </div>
           </div>
-          <div class="col-lg-3 col-md-3 col-sm-1"></div>
+          <div class="col-lg-3 col-md-3 col-sm-1">
+            
+          </div>
         </div>
         </q-page>
     </q-page-container>

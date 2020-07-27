@@ -1,0 +1,18 @@
+Hello {{ name }},
+
+This is a weekly reminder email from closetab.email to help you finish your reading list.
+Here's the list of links you've been meaning to read through this week.
+
+{{#each links}}
+{{href}}
+{{remainingDays}} day(s) left
+{{#if isTagged}}{{#each tags}} #{{tag}} {{/each}}{{/if}}
+{{/each}}
+
+
+Happy reading!
+
+To stop receiving these emails by visiting: http://closetab.email/unsubscribe/{{unsubscribeLinkToken}}
+You can also stop emails for a tag or a link by configuring your email settings - http://closetab.email/configure/email
+
+
