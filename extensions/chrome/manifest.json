@@ -4,14 +4,18 @@
     "version": "1.0",
     "manifest_version": 2,
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+
     "browser_action": {
+        "default_icon": "hello_extensions.png",
         "default_title": "CloseTab",
         "default_popup": "index.html"
     },
+
     "background": {
         "scripts": ["background.js"],
         "persistent": false
     },
+    
     "permissions": [
         "storage",
         "tabs"

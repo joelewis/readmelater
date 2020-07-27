@@ -1,3 +1,16 @@
+const ICON_IMG_URL = {
+    BOOKMARKED: 'bookmarked.png',
+    NOT_BOOKMARKED: 'not-bookmarked.png',
+    UNAUTHORIZED: 'login.png',
+}
+
+var updateBrowserIcon = function(type, tabId) {
+    chrome.browserAction.setIcon({ 
+        path: ICON_IMG_URL[type], 
+        tabId: tabId
+    });
+}
+
 function BookmarkObj() {
     return {
         href: '',
@@ -41,6 +54,8 @@ var app = new Vue({
                         self.saveBookmark(self.bookmark, data.jwt);
                     });
                 });
+            } else {
+                updateBrowserIcon('UNAUTHORIZED', tabId)
             }
         })
     },
@@ -57,7 +72,7 @@ var app = new Vue({
             this.bookmark.tags = tags.map(tag => {
                 return tag.text
             })
-
+            
             this.updateBookmark()
         },
 
@@ -77,12 +92,14 @@ var app = new Vue({
                     // show bookmark success
                     r.json().then(json => {
                         self.isLoggedIn = true    
+                        updateBrowserIcon('BOOKMARKED', tabId)
                     })
                 } else if (r.statue === 401){
                     // show logged out ui
-                    self.isLoggedIn = false                    
+                    self.isLoggedIn = false      
+                    updateBrowserIcon('UNAUTHORIZED', tabId)              
                 } else {
-                    // show error ui
+                    updateBrowserIcon('NOT_BOOKMARKED', tabId)
                 }
             })
         }

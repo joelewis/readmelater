@@ -1,4 +1,32 @@
-// Example POST method implementation:
+// chrome.runtime.onStartup.addListener(function callback)
+
+// chrome.runtime.onInstalled.addListener(function(details) {
+//     alert('Hey')
+//     // chrome.storage.sync.set({clean_news_feed: true});
+// });
+
+// chrome.tabs.onSelectionChanged.addListener(function(tabId) {
+//     // chrome.browserAction.setIcon({ 
+//     //     path: 'twitter.png', 
+//     //     tabId: tabId
+//     // });
+
+//     // chrome.browserAction.setIcon({
+//     //     imageData: draw(i*2, i*4), 
+//     //     tabId: tabId
+//     // });
+// });
+  
+// chrome.tabs.getSelected(null, function(tab) {
+//     chrome.browserAction.setIcon({
+//         imageData: draw(i*2, i*4), tabId: tab.id
+//     });
+// });
+  
+//   chrome.pageAction.onClicked.addListener(function(tab) {
+//       chrome.tabs.sendRequest(tab.id, {}, null);
+//   });
+
 function postJSON(url, headers) {
     // Default options are marked with *
     var opts = {
@@ -22,64 +50,72 @@ function postJSON(url, headers) {
     return fetch(url, opts);
 }
 
-var tryBookmarkingCurrentTab = function(url, tabId) {
+const ICON_IMG_URL = {
+    BOOKMARKED: 'bookmarked.png',
+    NOT_BOOKMARKED: 'not-bookmarked.png',
+    UNAUTHORIZED: 'login.png',
+}
+
+var updateBrowserIcon = function(type, tabId) {
+    chrome.browserAction.setIcon({ 
+        path: ICON_IMG_URL[type], 
+        tabId: tabId
+    });
+}
+
+var checkAndUpdateBookmarkExtentionIcon = function(url, tabId) {
     try {
         chrome.storage.local.get('jwt', function(data) {
             if (data.jwt) {
-                postJSON(`http://localhost:3000/is/bookmarked?href=${url}`, {'Authorization': 'Bearer ' + data.jwt}).then(function(r) {
+                postJSON(`http://localhost:3000/is/bookmarked?href=${encodeURIComponent(url)}`, {'Authorization': 'Bearer ' + data.jwt}).then(function(r) {
                     if (r.status === 200) {
                         r.json().then(json => {
-                            chrome.browserAction.setBadgeText({text: 'BOOKMARKED'});
-                            chrome.browserAction.setBadgeBackgroundColor({
-                                color: '#e74c3c',
-                                tabId: tabId
-                            })
+                            // bookmarked
+                            updateBrowserIcon('BOOKMARKED', tabId)
                         })
                     } else if (r.status === 401){
-                        chrome.browserAction.setBadgeText({text: 'LOGIN'});
-                        chrome.browserAction.setBadgeBackgroundColor({
-                            color: '#f1c40f',
-                            tabId: tabId
-                        })
+                        // unauthorized
+                        updateBrowserIcon('UNAUTHORIZED', tabId)
                     } else {
-                        chrome.browserAction.setBadgeText({text: 'AVAILABLE'});
-                        chrome.browserAction.setBadgeBackgroundColor({
-                            color: '#2ecc71',
-                            tabId: tabId
-                        })
+                        // Error
+                        updateBrowserIcon('NOT_BOOKMARKED', tabId)
                     }
                 })
             } else {
-                chrome.browserAction.setBadgeText({text: 'LOGIN'});
-                chrome.browserAction.setBadgeBackgroundColor({
-                    color: '#f1c40f',
-                    tabId: tabId
-                })
+                // Login
+                updateBrowserIcon('UNAUTHORIZED', tabId)
             }
           });
     } catch(e) {
-        chrome.browserAction.setBadgeText({text: 'LOGIN'});
-        chrome.browserAction.setBadgeBackgroundColor({
-            color: '#f1c40f',
-            tabId: tabId
-        })
+        // Login
+        updateBrowserIcon('UNAUTHORIZED', tabId)
     }
 }
 
-chrome.tabs.onActivated.addListener(function(info) {
+// // listen to tab URL changes
+// chrome.tabs.onUpdated.addListener(checkAndUpdateBookmarkExtentionIcon);
+
+// // listen to tab switching
+// chrome.tabs.onActivated.addListener(checkAndUpdateBookmarkExtentionIcon);
+
+// // listen for window switching
+// chrome.windows.onFocusChanged.addListener(checkAndUpdateBookmarkExtentionIcon);
+
+chrome.tabs.onSelectionChanged.addListener(function(tabId) {
     chrome.windows.getCurrent(function(w) {
-        chrome.tabs.getSelected(w.id,
-        function (response){
-            tryBookmarkingCurrentTab(response.url, info.tabId)
+        chrome.tabs.getSelected(w.id, function (response){
+            checkAndUpdateBookmarkExtentionIcon(response.url, tabId)
         });
-    });
+    })
 })
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    chrome.windows.getCurrent(function(w) {
-        chrome.tabs.getSelected(w.id,
-        function (response){
-            tryBookmarkingCurrentTab(response.url, tabId)
-        });
-    });
-});
+    if (changeInfo.status == 'complete' && tab.status == 'complete' && tab.url != undefined) {
+        chrome.windows.getCurrent(function(w) {
+            chrome.tabs.getSelected(w.id, function (response){
+                checkAndUpdateBookmarkExtentionIcon(response.url, tabId)
+            });
+        })
+    }
+})
+
