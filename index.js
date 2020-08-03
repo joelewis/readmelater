@@ -240,10 +240,12 @@ app.get('/open/:linktoken', async (req, res) => {
   var linktoken =  req.params.linktoken;
   var linkId = jwt.decode(linktoken, jwtSecret);
   try {
+    linkId = parseInt(linkId);
     var link = await u.getLinkById(linkId);
     await u.markLinkAsRead(linkId);
     res.redirect(link.href);
   } catch (e) {
+    console.error(e, e.stack);
     res.status(404).send();
   }
 });

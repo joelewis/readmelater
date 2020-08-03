@@ -24,10 +24,6 @@
       </q-toolbar>
     </q-header>
 
-    <!-- <q-footer class="q-mt-lg">
-      <p> Made with love from Madras </p>
-    </q-footer> -->
-
     <q-page-container>
         <q-page>
         <div class="row">
@@ -50,63 +46,67 @@
 
               <div class="q-pt-lg">
                 <p>
-                    Are you not able to close those dozens of tabs in your browser, because you are afraid you might forget them forever?
-                    Maybe it's a really long article or a group of related tabs from your recent research – now you can just <u>#tag</u> them, <u>set a time out</u> and we'll make sure you finish consuming those tabs <u>in time</u>.
+                    Are you scared to close those extra tabs in your browser, because you might forget them forever?
+                    Maybe it's a really long article or a group of related tabs from your recent research – now you can just <a href="#">#tag</a> them, <u>set a time out</u> and we'll make sure you finish consuming those tabs <u>in time</u>.
                 </p>
               </div>
 
               <div class="q-pt-lg">
                 <h2 class="text-red-9"> Smarter Bookmarking </h2>
                 <p>
-                  Most people bookmark links for coming back later. But most of us lack the disclipline to actually come back.
+                  We bookmark links in hopes of coming back later. Yet, most of us lack the disclipline to actually come back.
                 <!-- </p>
                 <p> -->
-                  That is why people have several tabs open even though they work actively only on a few tabs.
+                  This is the reason we end up having 99 tabs open.
                 <!-- </p>
                 <p> -->
-                  CloseTab solves this problem by being a little smarter to remind you to come back, while also gently keeping track of your reading list.
+                  <br>
+                  <b>CloseTab</b> helps by being a little smarter to remind you to come back, keeping track of your reading list.
                 </p>
               </div>
 
               <div class="q-pt-lg">
                 <h2 class=""> Weekly Emails</h2>
                 <p>
-                  Most people bookmark links for coming back later. But most of us lack the disclipline to actually come back.
-                <!-- </p>
-                <p> -->
-                  That is why people have several tabs open even though they work actively only on a few tabs.
-                <!-- </p>
-                <p> -->
-                  CloseTab solves this problem by being a little smarter to remind you to come back, while also gently keeping track of your reading list.
+                  Without cluttering your inbox, <b>CloseTab</b> starts sending weekly reminders of pending articles you've been meaning to read.
                 </p>
               </div>
 
               <div class="q-pt-lg">
                 <h2 class="text-red-9">Time Outs &amp; Tags</h2>
                 <p>
-                  Most people bookmark links for coming back later. But most of us lack the disclipline to actually come back.
-                <!-- </p>
-                <p> -->
-                  That is why people have several tabs open even though they work actively only on a few tabs.
-                <!-- </p>
-                <p> -->
-                  CloseTab solves this problem by being a little smarter to remind you to come back, while also gently keeping track of your reading list.
+                  You can choose your time-out within which you'd like to come back. The weekly digest will respect the timeout and stop notifying the link if marked read or if the time-out is crossed. Once you open a link from the reminder email, it automatically is marked as read.
+                   You can also <a href="#">#tag</a> your links for quicker lookups and groupings.
                 </p>
               </div>
 
               <div class="q-pt-lg q-pb-lg">
-                <h2 class="text-red-9">Pricing</h2>
+                <h2 class="">Pricing</h2>
                 <p>
-                  While these features will be free, we are still figuring out a pricing model to sustain the project.
-                  We are working on several premium features like Pocket integration, more intuitive reminders with reading time estimates and auto-planning to complete readings per #tag.
-                  Please register your preference.
+                  While these features will be free, we are working on advanced features like <b>Pocket integration, automatic archival of bookmarked pages, more intuitive reminders with reading time estimates and auto-planning to complete readings per #tag</b>. Please register your preference to help us decide.
                 </p>
-                <div>  
-                  <q-btn class="q-ml-lg" unelevated rounded color="red" label="I'm ready pay a small fee for advanced features" />
-                  <q-btn class="q-ml-lg" unelevated rounded color="light-blue-14" label="I'm better off with the basic features" />
+                <div class="q-pa-md bg-indigo-1">  
+                  <q-checkbox v-show="!showThankyou" v-model="willPay" label="I might opt in for a paid plan for these advanced features." />
+                  <transition name="fade">
+                    <div v-show="showThankyou"> Thank you! If you've got specific requirements please <a href="mailto:support@closetab.email">write to us</a></div>
+                  </transition>
+                  <!-- <q-btn class="q-ml-lg" unelevated rounded color="red" label="" /> -->
+                </div>
               </div>
-              </div>
+
           </div>
+          <div class="col-lg-3 col-md-3 col-sm-1">
+            
+          </div>
+        </div>
+        <div class="row bg-red-1 q-pa-sm q-mt-xl">
+          <div class="col-lg-3 col-md-3 col-sm-1">
+            
+          </div>
+          <div class="col">
+            <div class="text-center text-caption q-mb-0">Crafted with ❤️ from Madras</div>
+          </div>
+
           <div class="col-lg-3 col-md-3 col-sm-1">
             
           </div>
@@ -127,11 +127,31 @@ export default {
 
   data () {
     return {
-      leftDrawerOpen: false
+      leftDrawerOpen: false,
+      willPay: false,
+      showThankyou: false
+
+    }
+  },
+
+  watch: {
+    willPay: function(newVal, oldVal) {
+      if (newVal) {
+        var self = this;
+        setTimeout(() => {
+          self.showThankyou = true;
+        }, 500)
+      }
     }
   }
 }
 </script>
 
 <style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .8s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
 </style>
