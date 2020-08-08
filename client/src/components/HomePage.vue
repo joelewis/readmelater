@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf" class="bg-grey-1">
+  <q-layout view="hHh LpR fFf">
     <q-header bordered class="bg-white text-grey-8" height-hint="150">
       <q-toolbar class="CTE__toolbar">
         <q-btn 
@@ -18,45 +18,41 @@
         <q-space />
 
         <div class="q-gutter-sm row items-center no-wrap">
-          <q-btn-dropdown outline :no-icon-animation="true">
-            <template v-slot:label>
-              <q-item-section avatar>
-                <q-avatar color="primary" text-color="white">
-                  K
-                </q-avatar>
-              </q-item-section>
-            </template>
+          <q-btn unelevated round :label="user.name[0]"
+            color="orange"
+            text-color="grey-1"
+           >
+            <q-menu>
+              <q-list>
+                <q-item  v-close-popup>
+                  <q-item-section avatar>
+                    <q-avatar color="orange" text-color="white">
+                      {{ user.name[0] }}
+                    </q-avatar>
+                  </q-item-section>
 
-            <q-list>
-              <q-item  v-close-popup>
-                <q-item-section avatar>
-                  <q-avatar color="primary" text-color="white">
-                    K
-                  </q-avatar>
-                </q-item-section>
+                  <q-item-section>
+                    <q-item-label>{{ user.name }}</q-item-label>
+                    <q-item-label caption lines="1">{{ user.email }}</q-item-label>
+                  </q-item-section>
+                </q-item>
 
-                <q-item-section>
-                  <q-item-label>Karthikeyan Rajendran</q-item-label>
-                  <q-item-label caption lines="1">karthik.ricssion@gmail.com</q-item-label>
-                </q-item-section>
-              </q-item>
+                <q-separator />
 
-              <q-separator />
+                <q-item clickable v-close-popup to="/account-settings">
+                  <q-item-section>
+                    <q-item-label>Account Settings</q-item-label>
+                  </q-item-section>
+                </q-item>
 
-              <q-item clickable v-close-popup>
-                <q-item-section>
-                  <q-item-label>Account Settings</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item clickable v-close-popup>
-                <q-item-section>
-                  <q-item-label>Logout</q-item-label>
-                </q-item-section>                
-              </q-item>
-            </q-list>
-
-          </q-btn-dropdown>
+                <q-item clickable v-close-popup tag="a" href="/logout">
+                  <q-item-section>
+                    <q-item-label>Logout</q-item-label>
+                  </q-item-section>                
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
         </div>
         
       </q-toolbar>
@@ -65,18 +61,29 @@
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      bordered
       content-class="bg-white"
       :width="280"
+      behavior="desktop"
     >
       <q-scroll-area class="fit">
+        <q-btn  
+          rounded 
+          :icon="matAdd" 
+          style="background: #FFF;"
+          label="Add"
+          text-color="grey-10"
+          class="CTE__compose"
+        />
+
+      
         <q-list padding class="text-grey-8">
-          <q-item class="CTE__drawer-item" v-ripple v-for="link in links1" :key="link.text" clickable>
+          <q-item class="CTE__drawer-item" :to="link.to" v-ripple v-for="link in links1" :key="link.text" clickable active-class="bg-red-1">
             <q-item-section avatar>
               <q-icon :name="link.icon" />
             </q-item-section>
             <q-item-section>
-              <q-item-label>{{ link.text }}</q-item-label>
+              <q-item-label class="CTE__drawer-item-label">{{ link.text }}</q-item-label>
+              <q-item-label caption lines="1">{{ link.caption }}</q-item-label>
             </q-item-section>
           </q-item>
 
@@ -84,11 +91,11 @@
 
           <div class="q-mt-md">
             <div class="flex flex-center q-gutter-xs">
-              <a class="CTE__drawer-footer-link" href="javascript:void(0)" aria-label="Privacy">Privacy</a>
+              <router-link class="CTE__drawer-footer-link" to="/privacy" active-class="text-blue-7" aria-label="Privacy">Privacy</router-link>
               <span> · </span>
-              <a class="CTE__drawer-footer-link" href="javascript:void(0)" aria-label="Terms">Terms</a>
+              <router-link class="CTE__drawer-footer-link" to="/terms" active-class="text-blue-7" aria-label="Terms">Terms</router-link>
               <span> · </span>
-              <a class="CTE__drawer-footer-link" href="javascript:void(0)" aria-label="About">About CloseTab</a>
+              <router-link class="CTE__drawer-footer-link" to="/about" active-class="text-blue-7"r aria-label="About">About CloseTab</router-link>
             </div>
           </div>
 
@@ -98,7 +105,7 @@
     </q-drawer>
 
     <q-page-container>
-      <h1>Hmmmm okay</h1>
+      <router-view></router-view>
     </q-page-container>
 
   </q-layout>
@@ -107,8 +114,10 @@
 <script>
 import { 
   matMenu, matMoreVert, matNotifications,
-  matSettings
-  } from '@quasar/extras/material-icons'
+  matSettings, matInbox, matHelp,
+  matLabel, matAdd
+  } from '@quasar/extras/material-icons';
+import { mapGetters } from 'vuex';
 
 export default {
 
@@ -121,10 +130,10 @@ export default {
       leftDrawerOpen: false,
       currentRoute: 'inbox',
       links1: [
-        { icon: 'web', text: 'Top stories' },
-        { icon: 'person', text: 'For you' },
-        { icon: 'star_border', text: 'Favourites' },
-        { icon: 'search', text: 'Saved searches' }
+        { icon: matInbox, text: 'Inbox', caption: 'All links', to: '/inbox' },
+        { icon: matLabel, text: 'Tags', caption: 'Manage Tags', to: '/tags' },
+        { icon: matSettings, text: 'Settings', caption: 'Configure preferences', to: '/settings' },
+        { icon: matHelp, text: 'Faq', caption: 'Help center', to: '/faq' },
       ],
     }
   },
@@ -132,14 +141,18 @@ export default {
   created () {
     this.matMenu = matMenu
     this.matMoreVert = matMoreVert
-    this.matNotifications = matNotifications,
-    this.matSettings = matSettings
+    this.matNotifications = matNotifications
+    this.matAdd = matAdd
+  },
+
+  computed: {
+    ...mapGetters({
+      user: 'getUser'
+    })
   },
 
   methods: {
-    onItemClick() {
-      // console.log('Hello, I am cicked!')
-    }
+    
   }
 }
 </script>
@@ -157,6 +170,7 @@ export default {
     .q-item__section--avatar
       .q-icon
         color: #5f6368
+        padding-left: 4px
 
     .q-item__label
       color: #3c4043
@@ -165,6 +179,12 @@ export default {
       font-weight: 500
       line-height: 1.25rem
 
+    .q-item__label--caption
+      font-size: 0.75rem;
+      font-weight: 400;
+      line-height: 1.25rem;
+      letter-spacing: 0.03333em;
+
   &__drawer-footer-link
     color: inherit
     text-decoration: none
@@ -172,5 +192,14 @@ export default {
     font-size: .75rem
     &:hover
       color: #000
+
+  &__compose 
+    margin: 16px 8px
+    margin-bottom: 8px
+
+    .q-btn__content
+      svg 
+        margin-left: -4px
+        margin-right: 8px
 
 </style>

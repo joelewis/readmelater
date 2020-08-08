@@ -1,4 +1,4 @@
-<template>
+<template>  
   <home-page v-if="user"></home-page>
   <landing-page v-else></landing-page>
 </template>
