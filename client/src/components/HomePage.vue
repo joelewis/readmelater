@@ -12,7 +12,10 @@
           />
 
         <q-toolbar-title>
-          Toolbar
+          <router-link to="/" >
+            <img alt="CloseTab logo" style="min-width:45px;" src="../assets/closeTab.svg">
+            <span class="title-text">CloseTab</span>
+          </router-link>
         </q-toolbar-title>
 
         <q-space />
@@ -64,7 +67,7 @@
       content-class="bg-white"
       :width="280"
       behavior="desktop"
-    >
+      >
       <q-scroll-area class="fit">
         <q-btn  
           rounded 
@@ -101,7 +104,6 @@
 
         </q-list>
       </q-scroll-area>
-
     </q-drawer>
 
     <q-page-container>
@@ -161,6 +163,18 @@ export default {
 .CTE 
   &__toolbar 
     height: 64px
+
+    .q-toolbar__title
+      padding: 6px 0 0 12px
+      
+    .title-text 
+      font-size: 16px
+      font-weight: 600
+      vertical-align: top
+      padding: 4px
+      display: inline-block
+      color: #333
+      padding-top: 1px
   
   &__drawer-item
     line-height: 24px
