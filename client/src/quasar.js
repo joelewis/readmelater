@@ -2,6 +2,7 @@ import Vue from 'vue'
 
 import './styles/quasar.scss'
 import { Quasar } from 'quasar'
+import '@quasar/extras/material-icons/material-icons.css'
 
 Vue.use(Quasar, {
   config: {},

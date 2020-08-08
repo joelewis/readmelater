@@ -1,6 +1,6 @@
-import HomePage from './components/HomePage.vue'
+// import HomePage from './components/HomePage.vue'
 import Inbox from './components/Inbox.vue'
-import Faq from './components/Faq.vue'
+// import Faq from './components/Faq.vue'
 import Settings from './components/Settings.vue'
 
 let routes = [

@@ -18,7 +18,7 @@
         <q-space />
 
         <div class="q-gutter-sm row items-center no-wrap">
-          <q-btn-dropdown outline no-icon-animation="true"> 
+          <q-btn-dropdown outline :no-icon-animation="true">
             <template v-slot:label>
               <q-item-section avatar>
                 <q-avatar color="primary" text-color="white">
@@ -138,7 +138,7 @@ export default {
 
   methods: {
     onItemClick() {
-      console.log('Hello, I am cicked!')
+      // console.log('Hello, I am cicked!')
     }
   }
 }

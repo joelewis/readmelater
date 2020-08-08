@@ -21,7 +21,7 @@ const store = new Vuex.Store({
                 commit('setUser', resp.data)
                 resolve()
             } catch (e) {
-                resolve()
+              reject(e)
             }
         });
       }
