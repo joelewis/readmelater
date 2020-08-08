@@ -1,36 +1,64 @@
 <template>
-  <q-layout view="LHh Lpr lFf">
-    <q-header class="bg-grey-1">
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          @click="leftDrawerOpen = !leftDrawerOpen"
-          aria-label="Menu"
-          icon="fas fa-bars"
-          class="text-red"
-        />
+  <q-layout view="hHh lpR fFf" class="bg-grey-1">
+    <q-header bordered class="bg-white text-grey-8" height-hint="150">
+      <q-toolbar class="CTE__toolbar">
+        <q-btn 
+            flat 
+            round 
+            dense 
+            padding="8px"
+            :icon="matMenu" 
+            @click="leftDrawerOpen = !leftDrawerOpen"
+          />
 
         <q-toolbar-title>
-          <img style="height:48px;" alt="Quasar logo" src="../assets/closetab.png">
+          Toolbar
         </q-toolbar-title>
 
-        <div>
-<!-- 
-          <q-btn-dropdown
-            color="deep-purple"
-            label="Sign-in Using"
-          >
-            <div class="row no-wrap q-pa-md">
-                <q-btn type="a" href="/auth/google">Sign-in Using Google Account</q-btn>
-            </div>
-            <div class="row no-wrap q-pa-md">
-                <q-btn type="a" href="/auth/google">Sign-in Using Twitter Account</q-btn>
-            </div>
-          </q-btn-dropdown> -->
+        <q-space />
 
+        <div class="q-gutter-sm row items-center no-wrap">
+          <q-btn-dropdown outline no-icon-animation="true"> 
+            <template v-slot:label>
+              <q-item-section avatar>
+                <q-avatar color="primary" text-color="white">
+                  K
+                </q-avatar>
+              </q-item-section>
+            </template>
+
+            <q-list>
+              <q-item  v-close-popup>
+                <q-item-section avatar>
+                  <q-avatar color="primary" text-color="white">
+                    K
+                  </q-avatar>
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label>Karthikeyan Rajendran</q-item-label>
+                  <q-item-label caption lines="1">karthik.ricssion@gmail.com</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <q-separator />
+
+              <q-item clickable v-close-popup>
+                <q-item-section>
+                  <q-item-label>Account Settings</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-close-popup>
+                <q-item-section>
+                  <q-item-label>Logout</q-item-label>
+                </q-item-section>                
+              </q-item>
+            </q-list>
+
+          </q-btn-dropdown>
         </div>
+        
       </q-toolbar>
     </q-header>
 
@@ -38,93 +66,111 @@
       v-model="leftDrawerOpen"
       show-if-above
       bordered
-      content-class="bg-grey-2"
+      content-class="bg-white"
+      :width="280"
     >
-      <q-list>
-        <q-item dark class="bg-red-9" href="https://quasar.dev">
-          <q-item-section avatar>
-            <q-icon name="fas fa-user-tie" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Joe Lewis</q-item-label>
-            <q-item-label caption>lewis.joe.18@gmail.com</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <div class="text-grey-8 q-gutter-xs">
-              <q-btn size="12px" flat dense round dark class="text-white" />
+      <q-scroll-area class="fit">
+        <q-list padding class="text-grey-8">
+          <q-item class="CTE__drawer-item" v-ripple v-for="link in links1" :key="link.text" clickable>
+            <q-item-section avatar>
+              <q-icon :name="link.icon" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ link.text }}</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-separator inset class="q-my-sm" />
+
+          <div class="q-mt-md">
+            <div class="flex flex-center q-gutter-xs">
+              <a class="CTE__drawer-footer-link" href="javascript:void(0)" aria-label="Privacy">Privacy</a>
+              <span> · </span>
+              <a class="CTE__drawer-footer-link" href="javascript:void(0)" aria-label="Terms">Terms</a>
+              <span> · </span>
+              <a class="CTE__drawer-footer-link" href="javascript:void(0)" aria-label="About">About CloseTab</a>
             </div>
-          </q-item-section>
-        </q-item>
-        <q-item class="text-dark" clickable tag="router-link" to="/inbox" :active="currentRoute==='inbox'" active-class="bg-red-1">
-          <q-item-section avatar>
-            <q-icon name="fas fa-inbox" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Inbox</q-item-label>
-            <q-item-label caption>All Links</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable tag="router-link" to="/settings" :active="currentRoute==='settings'" active-class="bg-red-1 text-dark">
-          <q-item-section avatar>
-            <q-icon name="fas fa-cog" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Settings</q-item-label>
-            <q-item-label caption>Configure preferences</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable tag="a" href="#" :active="currentRoute==='tags'" active-class="bg-red-1 text-dark">
-          <q-item-section avatar>
-            <q-icon name="fas fa-hashtag" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Tags</q-item-label>
-            <q-item-label caption>Manage Tags</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable tag="a" href="#" :active="currentRoute==='faq'" active-class="bg-red-1 text-dark">
-          <q-item-section avatar>
-            <q-icon name="fas fa-question-circle" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Faq</q-item-label>
-            <q-item-label caption>Help Center</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable tag="a" href="/logout">
-          <q-item-section avatar>
-            <i class="fas fa-sign-out-alt" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Logout</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
+          </div>
+
+        </q-list>
+      </q-scroll-area>
+
     </q-drawer>
 
     <q-page-container>
-      <router-view></router-view>
+      <h1>Hmmmm okay</h1>
     </q-page-container>
+
   </q-layout>
 </template>
 
 <script>
-import HelloWorld from './HelloWorld.vue'
+import { 
+  matMenu, matMoreVert, matNotifications,
+  matSettings
+  } from '@quasar/extras/material-icons'
 
 export default {
 
   components: {
-    HelloWorld
+    
   },
 
   data () {
     return {
       leftDrawerOpen: false,
-      currentRoute: 'inbox'
+      currentRoute: 'inbox',
+      links1: [
+        { icon: 'web', text: 'Top stories' },
+        { icon: 'person', text: 'For you' },
+        { icon: 'star_border', text: 'Favourites' },
+        { icon: 'search', text: 'Saved searches' }
+      ],
+    }
+  },
+
+  created () {
+    this.matMenu = matMenu
+    this.matMoreVert = matMoreVert
+    this.matNotifications = matNotifications,
+    this.matSettings = matSettings
+  },
+
+  methods: {
+    onItemClick() {
+      console.log('Hello, I am cicked!')
     }
   }
 }
 </script>
 
-<style>
+<style lang="sass">
+.CTE 
+  &__toolbar 
+    height: 64px
+  
+  &__drawer-item
+    line-height: 24px
+    border-radius: 0 24px 24px 0
+    margin-right: 12px
+
+    .q-item__section--avatar
+      .q-icon
+        color: #5f6368
+
+    .q-item__label
+      color: #3c4043
+      letter-spacing: .01785714em
+      font-size: .875rem
+      font-weight: 500
+      line-height: 1.25rem
+
+  &__drawer-footer-link
+    color: inherit
+    text-decoration: none
+    font-weight: 500
+    font-size: .75rem
+    &:hover
+      color: #000
+
 </style>

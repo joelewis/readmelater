@@ -35,7 +35,7 @@
           <q-item-label><a :href="link.href">{{link.href}}</a></q-item-label>
           <q-item-label class="text-body2">
             <div>To be read within {{link.timeout}}</div>
-            <span v-for="tag in link.tags" style="margin-right:3px;"><a href="#" style="text-decoration:none;">#{{tag}}</a></span>
+            <span v-for="(tag, index) in link.tags" v-bind:key="index"  style="margin-right:3px;"><a href="#" style="text-decoration:none;">#{{tag}}</a></span>
           </q-item-label>
         </q-item-section>
       </q-item>
