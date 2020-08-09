@@ -227,10 +227,6 @@ export default {
             return links.filter(l => l.isSelected).length > 0
         },
 
-        isSingleSelected(links) {
-            return links.filter(l => l.isSelected).length === 1
-        },
-
         /*
           Checkbox state
           Mark all - check_box
