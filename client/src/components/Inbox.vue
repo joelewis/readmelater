@@ -260,7 +260,7 @@ export default {
         },
 
         onClick() {
-          console.log('I am clicked!')
+          // console.log('I am clicked!')
         }
     } 
 }

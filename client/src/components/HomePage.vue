@@ -98,7 +98,7 @@
               <span> · </span>
               <router-link class="CTE__drawer-footer-link" to="/terms" active-class="text-blue-7" aria-label="Terms">Terms</router-link>
               <span> · </span>
-              <router-link class="CTE__drawer-footer-link" to="/about" active-class="text-blue-7"r aria-label="About">About CloseTab</router-link>
+              <router-link class="CTE__drawer-footer-link" to="/about" active-class="text-blue-7" aria-label="About">About CloseTab</router-link>
             </div>
           </div>
 
