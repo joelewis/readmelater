@@ -8,12 +8,14 @@
     >
     <q-scroll-area class="fit">
       <q-btn  
+        type="a"
         rounded 
         :icon="matAdd" 
         style="background: #FFF;"
         label="Add"
         text-color="grey-10"
         class="CTE__compose"
+        to="/inbox/new"
       />
 
     

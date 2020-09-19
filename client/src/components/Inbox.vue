@@ -11,7 +11,7 @@
           <q-item-label caption lines="2">To be read within {{link.timeout}}</q-item-label>
 
           <q-item-label caption>
-            <q-chip style="color:rgba(0, 0, 0, 0.54)" v-for="(tag, index) in link.tags" v-bind:key="index" clickable outline @click="onClick">
+            <q-chip style="color:rgba(0, 0, 0, 0.54)" v-for="(tag, index) in link.tags" v-bind:key="index" clickable outline>
               #{{tag}}
             </q-chip>
           </q-item-label>          
@@ -114,42 +114,55 @@
     </q-page-sticky>
     
     <q-dialog v-model="showNewInput" persistent>
+
+
         <q-card style="min-width: 500px">
-          <q-card-section>
-            <div class="text-h6"></div>
-          </q-card-section>
 
           <q-card-section class="q-pt-none">
-            <q-input v-model="newlink.href" filled type="url" label="https://" hint="Link to bookmark">
+            <div class="text-h6 q-pa-md"> Add a new link </div>
+
+            <q-input 
+              class="q-pa-md"
+              v-model="newlink.href" 
+              filled 
+              type="url" 
+              label="https://" 
+              autofocus
+              >
               <!-- <template v-slot:prepend>
                   <q-icon name="fas fa-plus" />
               </template> -->
             </q-input>
 
-              <q-select class="q-mt-lg" v-model="newlink.timeout" :options="[1,2,3]" label="Time-out" hint="Time-out within which you'd like to read">
-                  <!-- <template v-slot:prepend>
-                      <q-icon name="fas fa-plus" />
-                  </template> -->
-              </q-select>
+            <q-select 
+              class="q-mt-lg q-pa-md"
+              v-model="newlink.timeout" 
+              :options="timeoutOptions"
+              option-value="id"
+              option-label="desc" 
+              label="I want to read this within">
+            </q-select>
 
-              <!-- <q-select
-                  filled
-                  v-model="newlink.tags"
-                  use-input
-                  use-chips
-                  multiple
-                  input-debounce="0"
-                  @new-value="createValue"
-                  :options="filterOptions"
-                  @filter="filterFn"
-                  style="width: 250px"
-              /> -->
+
+            <q-select
+                class="q-mt-lg q-pa-md"
+                filled
+                label="Tags"
+                v-model="newlink.tags"
+                use-input
+                use-chips
+                multiple
+                input-debounce=0
+                @new-value="createValue"
+                :options="newlink.alltags"
+                @filter="filterFn"
+              />
 
           </q-card-section>
 
           <q-card-actions align="right" class="text-primary">
-            <q-btn flat label="Cancel" v-close-popup />
-            <q-btn flat label="Add Link" v-close-popup />
+            <q-btn flat label="Cancel" v-close-popup @click="goback" />
+            <q-btn flat label="Add Link" @click="addLink"/>
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -213,12 +226,30 @@ export default {
             }
             
         ],
-        showNewInput: false,
+        showNewInput: this.$route.meta.openEditor || false,
         newlink: {
             href: '',
-            timeout: '2w',
-            tags: []
-        }
+            timeout: {
+              id: '2w',
+              desc: '2 Weeks'
+            },
+            tags: [],
+            alltags: ["google", "search"]
+        },
+        timeoutOptions: [
+          {
+            desc: '2 Days',
+            id: '2d',
+          },
+          {
+            desc: '2 Weeks',
+            id: '2w',
+          }, {
+            desc: '2 Months',
+            id: '2m'
+          }
+        ],
+        alltags: ["google", "search"]
       }
     },
 
@@ -255,8 +286,50 @@ export default {
           }
         },
 
-        onClick() {
+        addLink() {
           // console.log('I am clicked!')
+          console.log(this.newlink);
+        },
+
+        goback() {
+          this.$router.push({name: 'home'});
+        },
+        createValue (val, done) {
+          // Calling done(var) when new-value-mode is not set or "add", or done(var, "add") adds "var" content to the model
+          // and it resets the input textbox to empty string
+          // ----
+          // Calling done(var) when new-value-mode is "add-unique", or done(var, "add-unique") adds "var" content to the model
+          // only if is not already set
+          // and it resets the input textbox to empty string
+          // ----
+          // Calling done(var) when new-value-mode is "toggle", or done(var, "toggle") toggles the model with "var" content
+          // (adds to model if not already in the model, removes from model if already has it)
+          // and it resets the input textbox to empty string
+          // ----
+          // If "var" content is undefined/null, then it doesn't tampers with the model
+          // and only resets the input textbox to empty string
+
+          if (val.length > 0) {
+            if (!this.alltags.includes(val)) {
+              this.alltags.push(val)
+            }
+            done(val)
+          }
+        },
+
+        filterFn (val, update) {
+          var self = this;
+          update(() => {
+            console.log(val);
+            if (val === '') {
+              self.newlink.alltags = self.alltags
+            }
+            else {
+              const needle = val.toLowerCase()
+              self.newlink.alltags = self.alltags.filter(t => t.startsWith(val))
+              console.log(self.newlink.alltags)
+            }
+          })
         }
     } 
 }

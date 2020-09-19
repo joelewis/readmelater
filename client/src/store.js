@@ -28,7 +28,8 @@ const store = new Vuex.Store({
               commit('setUser', resp.data)
               resolve()
           } catch (e) {
-            reject(e)
+            resolve()
+            // reject(e)
           }
       });
     },
@@ -44,7 +45,11 @@ const store = new Vuex.Store({
 
     getDrawerStatus: state => {
       return state.view.drawerOpen
-    }     
+    },
+    
+    isLoggedIn: state=> {
+      return state.user != null;
+    }
   }
 })
 

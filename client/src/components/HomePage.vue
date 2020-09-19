@@ -3,13 +3,13 @@
     <Header />
     <Drawer />
     <q-page-container>
-      <router-view></router-view>
+      <router-view :key="$route.path"></router-view>
     </q-page-container>
   </q-layout>
 </template>
 
 <script>
-import { 
+import {
   matMoreVert, matNotifications,
   matAdd
   } from '@quasar/extras/material-icons';
