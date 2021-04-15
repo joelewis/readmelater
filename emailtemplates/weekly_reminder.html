@@ -6,7 +6,7 @@ Here's the list of links you've been meaning to read through this week.</p>
 
 {{#each links}}
 <p>
-<a style="font-size:20px;" href="{{closeTabLink}}">{{href}}</a> <br>
+<a href="{{closeTabLink}}">{{href}}</a> <br>
 {{remainingDays}} day(s) left <br>
 {{#if isTagged}}{{#each tags}}<a href="#">#{{tag}}</a>{{#if @last}}&nbsp;{{else}},&nbsp;{{/if}}{{/each}}{{/if}}
 {{/each}}

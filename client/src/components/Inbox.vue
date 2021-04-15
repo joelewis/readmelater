@@ -1,59 +1,18 @@
 <template>
-  <q-page style="padding-top: 56px">
-    <q-list class="bookmarks-list">
-      <q-item :key="link.id" v-for="link in links" v-bind:class="{'selected': link.isSelected }">
-        <q-item-section side>
-          <q-checkbox v-model="link.isSelected" />
-        </q-item-section>
-
-        <q-item-section>
-          <q-item-label lines="1"><a :href="link.href">{{link.href}}</a></q-item-label>
-          <q-item-label caption lines="2">To be read within {{link.timeout}}</q-item-label>
-
-          <q-item-label caption>
-            <q-chip style="color:rgba(0, 0, 0, 0.54)" v-for="(tag, index) in link.tags" v-bind:key="index" clickable outline>
-              #{{tag}}
-            </q-chip>
-          </q-item-label>          
-        </q-item-section>
-
-        <q-item-section side top class="bookmarked-time">
-          1 min ago
-        </q-item-section>
-
-        <q-item-section top side class="bookmark-action">
-          <div class="text-grey-8 q-gutter-xs">
-            <q-btn padding="8px" style="color:#5f6368" flat dense round icon="delete">
-              <q-tooltip>
-                Delete
-              </q-tooltip>
-            </q-btn>
-            <q-btn padding="8px" style="color:#5f6368" flat dense round icon="done">
-              <q-tooltip>
-                Mark as read
-              </q-tooltip>
-            </q-btn>
-            <q-btn padding="8px" style="color:#5f6368" flat dense round icon="more_vert" @click="showNewInput = !showNewInput">
-              <q-tooltip>
-                More
-              </q-tooltip>
-            </q-btn>
-          </div>
-        </q-item-section>
-
-      </q-item>
-    </q-list>
-
-    <q-page-sticky expand position="top">
+  <q-page>
+    <div class="text-center" v-if="!links.length"><h4> Welcome! You haven't saved any links yet. <br><router-link to="/inbox/new">Start by adding new links.</router-link></h4></div>
+    <q-list v-if="links.length" class="bookmarks-list bg-white">
       <q-toolbar class="bg-white text-black">          
-        <q-toolbar-title>
+        <q-toolbar-title class="col-3 col-sm-3 col-md-3 col-xs-6">
 
           <q-btn 
+            no-caps
             flat 
             round 
             dense 
             style="color:#5f6368"
             padding="8px"
+            size="sm"
             :icon="checkAndSetSelectStatus(links)"
             @click="changeCommonSelectAction(links)"
             >
@@ -63,27 +22,16 @@
           </q-btn>
 
           <q-btn 
+            no-caps
+            outline
             flat 
-            round 
-            dense 
-            style="color:#5f6368"
-            padding="8px"
-            icon="refresh" 
-            v-if="!isMultipleSelected(links)"
-            >
-            <q-tooltip>
-              Refresh
-            </q-tooltip>
-          </q-btn>
-
-          <q-btn 
-            flat 
-            round 
             dense 
             style="color:#5f6368"
             padding="8px"
             icon="done_all" 
-            v-if="isMultipleSelected(links)"
+            :disable="!isMultipleSelected(links)"
+            label="Mark link as read"
+            color="primary"
             >
             <q-tooltip>
               Mark as read
@@ -91,43 +39,108 @@
           </q-btn>
 
           <q-btn 
+            no-caps
             flat 
-            round 
+            bordered
             dense 
             style="color:#5f6368"
             padding="8px"
             icon="delete" 
-            v-if="isMultipleSelected(links)"
+            label="Delete Link"
+            color="negative"
+            :disable="!isMultipleSelected(links)"
             >
             <q-tooltip>
               Delete
             </q-tooltip>
           </q-btn>
-
-          <!-- 
-            icons: 
-            done, done_all, delete , mark_email_read, mark_email_unread, 
-            markunread, create, check_box, check_box_outline_blank, indeterminate_check_box
-          -->
         </q-toolbar-title>
+
+        <q-select
+          ref="tagFilterElement"
+          dense
+          class="tagselector q-pa-sm col-3"
+          filled
+          label="Filter by tags"
+          v-model="filterTags"
+          use-input
+          use-chips
+          multiple
+          input-debounce=0
+          :options="tagOptions"
+          @filter="filterFn"
+          @input="onTagsFilterInput"
+        >
+          <template v-slot:append>
+            <q-icon
+              v-if="filterTags.length"
+              class="cursor-pointer"
+              name="clear"
+              @click.stop="clearFilterTags"
+            />
+          </template>
+        </q-select>
       </q-toolbar>
-    </q-page-sticky>
+
+      <q-item :id="link.id" clickable @click="link.isSelected = !link.isSelected" :key="link.id" v-for="link in links" v-bind:class="{'selected': link.isSelected }">
+        <q-item-section side>
+          <q-checkbox size="xs" color="red" v-model="link.isSelected" />
+        </q-item-section>
+
+        <q-item-section>
+          <q-item-label lines="2"><a class="text-indigo link-href" v-on:click.stop target="_blank" :href="link.href">{{link.href}}</a></q-item-label>
+          <q-item-label style="font-size:0.8em;">
+            <q-icon @click.stop="setNotifyStatus([link.id], !link.notify)" :color="!link.notify? 'primary':'grey'" size="xs" outline name="done_all">
+              <q-tooltip>
+                Marked as read
+              </q-tooltip>
+            </q-icon>
+            {{link.notify? getRemainingTimeLeft(link.timeout) : "Link marked as read"}}
+          </q-item-label>
+          <q-item-label>
+            <q-chip @click.stop="addToFilter(tag)" dense color="indigo-1" v-for="(tag, index) in link.tags" v-bind:key="index" clickable>
+              #{{tag.tag}}
+            </q-chip>
+          </q-item-label>
+        </q-item-section>
+
+        <q-item-section side top class="bookmarked-time">
+          <div> {{ getBookmarkedDate(link.createdAt) }} </div>
+          <div class="q-gutter-xs bookmark-action">
+            <q-btn @click.stop="setNotifyStatus([link.id], false)" color="primary" size="sm" outline round icon="done_all">
+              <q-tooltip>
+                Mark as read
+              </q-tooltip>
+            </q-btn>
+            <q-btn @click.stop="openEditDialog(link)" color="teal" size="sm" outline round icon="edit">
+              <q-tooltip>
+                Edit
+              </q-tooltip>
+            </q-btn>
+            <q-btn @click.stop="deleteLink(link.id)" color="negative" size="sm" outline round icon="delete">
+              <q-tooltip>
+                Delete
+              </q-tooltip>
+            </q-btn>
+          </div>
+        </q-item-section>
+      </q-item>
+    </q-list>
     
     <q-dialog v-model="showNewInput" persistent>
-
-
-        <q-card style="min-width: 500px">
-
+        <q-card style="min-width: 500px" class="bg-blue-grey-1">
           <q-card-section class="q-pt-none">
-            <div class="text-h6 q-pa-md"> Add a new link </div>
+            <div class="text-h6 q-pa-md">  </div>
 
             <q-input 
-              class="q-pa-md"
+              class="q-pa-sm"
               v-model="newlink.href" 
               filled 
               type="url" 
               label="https://" 
               autofocus
+              dense
+              placeholder="https://example.com/"
               >
               <!-- <template v-slot:prepend>
                   <q-icon name="fas fa-plus" />
@@ -135,7 +148,8 @@
             </q-input>
 
             <q-select 
-              class="q-mt-lg q-pa-md"
+              dense
+              class="q-pa-md"
               v-model="newlink.timeout" 
               :options="timeoutOptions"
               option-value="id"
@@ -145,24 +159,28 @@
 
 
             <q-select
-                class="q-mt-lg q-pa-md"
+                ref="tagsearchElement"
+                dense
+                class="tagselector q-pa-sm"
                 filled
-                label="Tags"
+                label="Tags (Enter comma separated tags and press Enter)"
                 v-model="newlink.tags"
                 use-input
                 use-chips
                 multiple
                 input-debounce=0
                 @new-value="createValue"
-                :options="newlink.alltags"
+                :options="tagOptions"
                 @filter="filterFn"
+                @input="onTagsInput"
               />
 
           </q-card-section>
+          <q-separator />
 
-          <q-card-actions align="right" class="text-primary">
-            <q-btn flat label="Cancel" v-close-popup @click="goback" />
-            <q-btn flat label="Add Link" @click="addLink"/>
+          <q-card-actions align="right" class="q-pa-lg">
+            <q-btn no-caps class="q-pr-md" unelevated size="md" dense color="primary" icon="done" label="Save Link" @click="addLink"/>
+            <q-btn flat no-caps dense size="md" color="primary" icon="close" label="Cancel" v-close-popup @click="goback" />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -171,61 +189,13 @@
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex'
+
 export default {
   data () {
     return {
         commonSelectStatus: 'check_box_outline_blank',
-        links: [
-            {
-                id: 1,
-                href: 'https://google.com',
-                timeout: '2 days',
-                tags: ['google', 'search'],
-                domain: 'google.com',
-                isSelected: false
-            },
-            {
-                id: 2,
-                href: 'https://closetab.email',
-                timeout: '2 weeks',
-                tags: [],
-                domain: 'closetab.com',
-                isSelected: false
-            },
-            {
-                id: 3,
-                href: 'https://google.com',
-                timeout: '2 days',
-                tags: ['google', 'search'],
-                domain: 'google.com',
-                isSelected: false
-            },
-            {
-                id: 4,
-                href: 'https://closetab.email',
-                timeout: '2 weeks',
-                tags: [],
-                domain: 'closetab.com',
-                isSelected: false
-            },
-            {
-                id: 5,
-                href: 'https://google.com',
-                timeout: '2 days',
-                tags: ['google', 'search'],
-                domain: 'google.com',
-                isSelected: false
-            },
-            {
-                id: 6,
-                href: 'https://closetab.email',
-                timeout: '2 weeks',
-                tags: [],
-                domain: 'closetab.com',
-                isSelected: false
-            }
-            
-        ],
+        // links: [],
         showNewInput: this.$route.meta.openEditor || false,
         newlink: {
             href: '',
@@ -249,7 +219,42 @@ export default {
             id: '2m'
           }
         ],
-        alltags: ["google", "search"]
+        tagOptions: [],
+      }
+    },
+
+    created: async function() {
+      try {
+        await this.$store.dispatch('fetchLinks')
+        await this.$store.dispatch('fetchTags')
+        if (this.$route.query.filter) {
+          var filter = JSON.parse(window.decodeURIComponent(this.$route.query.filter))
+          this.$store.commit('setFilter', filter);
+        }
+        this.tagOptions = this.$store.state.tags.map(t => t.tag);
+        // await this.$store.dispatch('fetchTags')
+      } catch (e) {
+      }
+    },
+
+    computed: {
+      ...mapGetters(['links']),
+      ...mapState(['tags']),
+      filterTags: {
+        get () {
+          return this.$store.state.filter.tags
+        },
+        set (value) {
+          var filter = this.$store.state.filter;
+          filter.tags = value
+          this.$store.commit('setFilter', filter);
+        }
+      }
+    },
+
+    watch: {
+      filterTags(oldval, newval) {
+        this.$store.dispatch('fetchLinks')
       }
     },
 
@@ -269,9 +274,6 @@ export default {
           if(links.filter(l => l.isSelected).length === links.length) {
             this.commonSelectStatus = 'check_box';
             return 'check_box'
-          } else if(links.filter(l => l.isSelected).length > 0) {
-            this.commonSelectStatus = 'indeterminate_check_box';
-            return 'indeterminate_check_box'
           } else {
             this.commonSelectStatus = 'check_box_outline_blank';
             return 'check_box_outline_blank'
@@ -286,13 +288,86 @@ export default {
           }
         },
 
+        getRemainingTimeLeft(datestring) {
+          var date = new Date(datestring);
+          var today = new Date();
+          var days = Math.round((date-today)/(24 * 60 * 60 * 1000))
+          if (days > 0) {
+            return days + " day(s) remaining to complete";
+          } else {
+            return "Must have been completed reading by " + days + " day(s)";
+          }
+        },
+
+        getBookmarkedDate(datestring) {
+          var date = new Date(datestring);
+          var today = new Date();
+          var days = Math.round((today-date)/(24 * 60 * 60 * 1000));
+          const rtf = new Intl.RelativeTimeFormat("en", {
+              localeMatcher: "best fit", // other values: "lookup"
+              numeric: "always", // other values: "auto"
+              style: "long", // other values: "short" or "narrow"
+          });
+          return "Added " + rtf.format(-days, "days");
+        },
+
+        openEditDialog(link) {
+          this.newlink.href=  link.href;
+          this.newlink.tags = link.tags || [];
+          this.showNewInput = true;
+        },
+
         addLink() {
-          // console.log('I am clicked!')
-          console.log(this.newlink);
+          var linkParams = {
+            href: this.newlink.href,
+            timeout: this.newlink.timeout.id,
+            tags: this.newlink.tags
+          }
+          this.$store.dispatch('addLink', linkParams);
+          this.showNewInput = false;
+        },
+
+        deleteLink(linkId) {
+          this.$store.dispatch('deleteLink', linkId);
+        },
+
+        setNotifyStatus(links, status) {
+          this.$store.dispatch('setNotifyStatus', {links, status});
+        },
+
+        onTagsInput() {
+          var self = this;
+          this.$refs.tagsearchElement.updateInputValue("");
+          setTimeout(()=> {
+            self.$refs.tagsearchElement.hidePopup();
+          }, 0)
+        },
+
+        onTagsFilterInput() {
+          var self = this;
+          this.$refs.tagFilterElement.updateInputValue("");
+          setTimeout(()=> {
+            self.$refs.tagFilterElement.hidePopup();
+          }, 0)
+        },
+
+        addToFilter(tag) {
+          if (this.filterTags.includes(tag.tag)) {
+            return;            
+          }
+          this.filterTags.push(tag.tag);
+        },
+
+        clearFilterTags() {
+          var self = this;
+          this.filterTags = [];
+          setTimeout(()=> {
+            self.$refs.tagFilterElement.hidePopup();
+          }, 0)
         },
 
         goback() {
-          this.$router.push({name: 'home'});
+          this.$router.currentRoute.name != 'inbox' && this.$router.push({name: 'inbox'});
         },
         createValue (val, done) {
           // Calling done(var) when new-value-mode is not set or "add", or done(var, "add") adds "var" content to the model
@@ -309,27 +384,41 @@ export default {
           // If "var" content is undefined/null, then it doesn't tampers with the model
           // and only resets the input textbox to empty string
 
+          // strip away initial '#' char if user type with hash
+
+          var self = this;
           if (val.length > 0) {
-            if (!this.alltags.includes(val)) {
-              this.alltags.push(val)
-            }
-            done(val)
+            const model = (this.newlink.tags || []).slice()
+            val
+              .split(/[,\s]+/)
+              .map(v => v.trim())
+              .filter(v => v.length > 0)
+              .map(v => v.startsWith('#') ? v.substring(1): v)
+              .forEach(v => {
+                if (self.tagOptions.includes(v) === false) {
+                  self.tagOptions.push(v);
+                }
+                if (model.includes(v) === false) {
+                  model.push(v);
+                }
+              })
+
+            done(null)
+            this.newlink.tags = model;
+            this.onTagsInput();
           }
         },
 
-        filterFn (val, update) {
-          var self = this;
-          update(() => {
-            console.log(val);
-            if (val === '') {
-              self.newlink.alltags = self.alltags
-            }
-            else {
-              const needle = val.toLowerCase()
-              self.newlink.alltags = self.alltags.filter(t => t.startsWith(val))
-              console.log(self.newlink.alltags)
-            }
-          })
+        filterFn: function(val, update) {
+            var self = this;
+            update(() => {
+              if (val === '') {
+                self.tagOptions = this.$store.state.tags.map(t => t.tag)
+              }
+              else {
+                self.tagOptions = self.tagOptions.filter(t => t.startsWith(val))
+              }
+            })
         }
     } 
 }
@@ -337,28 +426,29 @@ export default {
 
 <style lang="sass">
 .bookmarks-list
-  .q-item 
-    
-    box-shadow: inset 0 -1px 0 0 rgba(100,121,143,0.122)
+  .q-item
 
     &.selected
-      background-color: #c2dbfb
+      background-color: #ffebee
 
     .bookmarked-time
       display: block
       font-size: 14px
 
     .bookmark-action
-      display: none
+      visibility: hidden
 
     &:hover
-      box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15)
-      z-index: 10
-
+    
       .bookmark-action
-        display: block
-      
-      .bookmarked-time
-        display: none
-  
+        visibility: visible
+
+
+.tagselector
+  .q-chip
+    background-color: #e8eaf6;
+
+
+.link-href
+  word-break: break-all
 </style>

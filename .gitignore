@@ -5,6 +5,8 @@ __pycache__/
 
 node_modules
 data.db
+sessions
+sessions.db
 public/**
 
 # C extensions

@@ -6,6 +6,7 @@ import passport from 'passport';
 import PassportGoogleOauth from 'passport-google-oauth';
 import PassportJwt from 'passport-jwt';
 import session from "express-session";
+import connectSqlite3 from "connect-sqlite3"
 import bodyParser from "body-parser";
 import PrismaClient from '@prisma/client'
 import jwt from 'jsonwebtoken';
@@ -16,6 +17,8 @@ import * as u from './utils.js';
 import AWS from 'aws-sdk';
 
 dotenv.config();
+
+var SQLiteStore = connectSqlite3(session);
 
 var JWTstrategy = PassportJwt.Strategy;
 var ExtractJwt = PassportJwt.ExtractJwt;
@@ -35,14 +38,15 @@ const app = express()
 const port = process.env.PORT || 3000 // import from env
 const jwtSecret = process.env.SECRET; // import from env
 
-app.use(session({ secret: process.env.SECRET })); // import from env
+app.use(session({ 
+  secret: process.env.SECRET,
+  store: new SQLiteStore()
+})); // import from env
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors())
-
-
 
 
 // google oauth handling
@@ -53,7 +57,7 @@ app.use(cors())
 passport.use('google', new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/callback"
+    callbackURL: process.env.DOMAIN_URL + "/auth/google/callback"
   },
   async function(accessToken, refreshToken, profile, done) {
     var email = profile._json.email;
@@ -189,7 +193,7 @@ app.get('/session',
   });
 
 
-app.post('/bookmark', ensureAuthAPI, function(req, res) {
+app.post('/bookmark', ensureAuthAPI, async function(req, res) {
   var href = req.body.href;
   if (!href) {
     return res.status(400).json({error: "missing href"})
@@ -204,7 +208,7 @@ app.post('/bookmark', ensureAuthAPI, function(req, res) {
 
   var tags = req.body.tags || [];
 
-  var link = u.addLink(req.user, href, timeout, tags);
+  var link = await u.addLink(req.user, href, timeout, tags);
   
   res.json(link);
 });
@@ -222,20 +226,60 @@ app.get('/is/bookmarked', ensureAuthAPI, async function(req, res) {
   }
 });
 
-app.post('/stopemails', ensureAuth, function(req, res) {
+app.delete('/bookmark', ensureAuthAPI, async (req, res) => {
+  var linkId = req.body.id;
+  try {
+    await u.deleteLinkById(linkId);
+    res.json(true)
+  } catch(e) {
+    res.json(false);
+  }
+  
+})
+
+app.post('/stopemails', ensureAuthAPI, async function(req, res) {
   if (req.body.type === 'user') {
     // stop all email notifications for all links for user
   } else if (req.body.type === 'link') {
     var links = req.body.links;
+    var links = await Promise.all(links.map(async (linkId) => {
+      return u.markLinkAsRead(linkId)
+    }))
     // stop email notifications for these links
   } else if (req.body.type === 'tag') {
     var tag = req.body.tag;
     // stop email notifications for all links under this tag
   }
+  res.json(links);
 });
 
-app.get('/links', ensureAuthAPI, function(req, res) {
+app.post('/startemails', ensureAuthAPI, async function(req, res) {
+  if (req.body.type === 'user') {
+    // stop all email notifications for all links for user
+  } else if (req.body.type === 'link') {
+    var links = req.body.links;
+    var links = await Promise.all(links.map(async (linkId) => {
+      return u.markLinkAsUnread(linkId)
+    }))
+    // stop email notifications for these links
+  } else if (req.body.type === 'tag') {
+    var tag = req.body.tag;
+    // stop email notifications for all links under this tag
+  }
+  res.json(links);
+});
+
+app.get('/links', ensureAuthAPI, async function(req, res) {
   // fetch all links for the user
+  var filter = req.query.filter && JSON.parse(req.query.filter)
+  console.log(filter);
+  var links = await u.getAllLinksByUser(req.user.id, filter || {});
+  res.json(links);
+});
+
+app.get('/tags', ensureAuthAPI, async function(req, res) {
+  var tags = await u.getAllTags(req.user.id);
+  res.json(tags);
 });
 
 app.get('/open/:linktoken', async (req, res) => {
@@ -251,6 +295,16 @@ app.get('/open/:linktoken', async (req, res) => {
     res.status(404).send();
   }
 });
+
+// app.post('/markread', async (req, res) => {
+//   var linkId = req.body.id;
+//   try {
+//     await u.markLinkAsRead(linkId);
+//     res.json(true)
+//   } catch(e) {
+//     res.json(false);
+//   }
+// });
 
 app.get('/unsubscribe/:token', async (req, res) => {
   var token = req.params.token;

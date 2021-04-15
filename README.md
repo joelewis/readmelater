@@ -44,4 +44,19 @@ This project is one initiative on that direction. Most of the above can be achei
 6. `cd .. && node index.js` to run the server
 
 
+##TODO:
+
+/:tag route for listing links based on a tag
+/faq for frequently asked questions
+/privacy page for privacy policy
+/emailsettings page for configuring email notification settings by tag
+make the inbox page look better
+
+
+## To Debug prisma APIs open node interpreter and paste below code
+```
+var PrismaClient = require('@prisma/client')
+const prisma = new PrismaClient.PrismaClient();
+var pp = function(promise) { promise.then(r => console.log(r)) }
+pp(prisma.link.findMany())
 

@@ -1,10 +1,8 @@
 <template>
   <q-drawer
     v-model="leftDrawerOpen"
-    show-if-above
     content-class="bg-white"
-    :width="280"
-    behavior="desktop"
+    :breakpoint="700"
     >
     <q-scroll-area class="fit">
       <q-btn  
@@ -12,7 +10,7 @@
         rounded 
         :icon="matAdd" 
         style="background: #FFF;"
-        label="Add"
+        label="New Link"
         text-color="grey-10"
         class="CTE__compose"
         to="/inbox/new"
@@ -68,7 +66,7 @@ export default {
     return {
       links1: [
         { icon: matInbox, text: 'Inbox', caption: 'All links', to: '/inbox' },
-        { icon: matLabel, text: 'Tags', caption: 'Manage Tags', to: '/tags' },
+        // { icon: matLabel, text: 'Tags', caption: 'Manage Tags', to: '/tags' },
         { icon: matSettings, text: 'Settings', caption: 'Configure preferences', to: '/settings' },
         { icon: matHelp, text: 'Faq', caption: 'Help center', to: '/faq' },
       ],

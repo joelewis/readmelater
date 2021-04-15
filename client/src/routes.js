@@ -35,7 +35,6 @@ let routes = [
         path: '/inbox',
         name: 'inbox',
         component: Inbox,
-        beforeEnter: ensureAuth
     },
     {
         path: '/inbox/new',

@@ -53,13 +53,27 @@ export const getLinkByHref = async (user, href) => {
             userId_href: {
                 userId: user.id,
                 href: href
-            }
+            },
+        },
+        include: {
+            tags: true
         }
     })
 }
 
 export const getLinkById = async (id) => {
     return await prisma.link.findOne({
+        where: {
+            id: id
+        },
+        include: {
+            tags: true
+        }
+    })
+}
+
+export const deleteLinkById = async (id) => {
+    return await prisma.link.delete({
         where: {
             id: id
         }
@@ -77,7 +91,19 @@ export const markLinkAsRead = async (id) => {
     })
 }
 
+export const markLinkAsUnread = async (id) => {
+    return await prisma.link.update({
+        where: {
+            id: id
+        },
+        data: {
+            notify: true
+        }
+    })
+}
+
 export const setTags2Link = async (link, tags) => {
+    console.log(link, tags);
     return await prisma.link.update({
         where: { id: link.id },
         data: {
@@ -86,6 +112,9 @@ export const setTags2Link = async (link, tags) => {
                     return {id: t.id}
                 })
             }
+        }, 
+        include: {
+            tags: true
         }
     })
 }
@@ -99,9 +128,8 @@ export const addLink = async (user, href, timeout, tags) => {
 
     var link = await getLinkByHref(user, href);
 
-    console.log(link);
     if (!link) { // if link is not present create everything
-        await prisma.link.create({
+        var link = await prisma.link.create({
             data: {
                 user: {
                     connect: {
@@ -124,7 +152,6 @@ export const addLink = async (user, href, timeout, tags) => {
 
     // update link's tags
     return await setTags2Link(link, tags);
-
 }
 
 export const timeNow2Date = function(keyString) { // key = 'xd, xw, xm'
@@ -212,6 +239,59 @@ export const stopMailsForUser = async (id) => {
         },
         data: {
             notify: false
+        }
+    })
+}
+
+export const getAllLinksByUser = async (userId, filters) => {
+    
+    var query = {
+        where: {
+            userId: userId
+        },
+        include: {
+            tags: true
+        }
+    };
+    if (filters.tags && filters.tags.length) {
+        query.where.OR = filters.tags.map(t => {
+            return {
+                tags: {
+                    some: {
+                        tag: t
+                    }
+                }
+            }
+        });
+    }
+    
+    if (filters.link) {
+        query.where.href = {
+            contains: filters.link
+        }
+    }
+
+    return await prisma.link.findMany(query)
+}
+
+export const getAllTags = async (userId) => {
+    return await prisma.tag.findMany({
+        where: {
+            userId: userId
+        }
+    })
+}
+ 
+export const getPendingLinksByUser = async (userId) => {
+    return await prisma.link.findMany({
+        where: {
+            userId: userId,
+            timeout: {
+                gte: new Date()
+            }
+        },
+        include: {
+            tags: true
         }
     })
 }
@@ -305,3 +385,11 @@ export const sendMails = async () => {
 }
 
 
+// async deleteLink ({commit}, linkId) {
+//     try {
+//       var resp = await axios.delete('/bookmark', {id: linkId})
+//       commit('deleteLink', linkId);
+//     } catch (e) { 
+//       throw e;
+//     }
+//   },

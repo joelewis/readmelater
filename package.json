@@ -9,6 +9,7 @@
     "@types/node": "12.12.50",
     "aws-sdk": "^2.720.0",
     "body-parser": "1.19.0",
+    "connect-sqlite3": "^0.9.11",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",

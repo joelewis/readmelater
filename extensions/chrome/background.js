@@ -27,7 +27,7 @@
 //       chrome.tabs.sendRequest(tab.id, {}, null);
 //   });
 
-function postJSON(url, headers) {
+function getJSON(url, headers) {
     // Default options are marked with *
     var opts = {
         method: 'GET', // *GET, POST, PUT, DELETE, etc.
@@ -67,7 +67,7 @@ var checkAndUpdateBookmarkExtentionIcon = function(url, tabId) {
     try {
         chrome.storage.local.get('jwt', function(data) {
             if (data.jwt) {
-                postJSON(`http://localhost:3000/is/bookmarked?href=${encodeURIComponent(url)}`, {'Authorization': 'Bearer ' + data.jwt}).then(function(r) {
+                getJSON(chrome.runtime.getManifest().domainUrl + `/is/bookmarked?href=${encodeURIComponent(url)}`, {'Authorization': 'Bearer ' + data.jwt}).then(function(r) {
                     if (r.status === 200) {
                         r.json().then(json => {
                             // bookmarked

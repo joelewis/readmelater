@@ -28,7 +28,7 @@ var tryBookmarkingCurrentTab = function() {
             console.log('jwt: ', data.jwt);
             if (data.jwt) {
                 // check if valid token by calling api
-                postJSON('http://localhost:3000/bookmark', {key: 'value'}, {'Authorization': 'Bearer ' + data.jwt}).then(function(r) {
+                postJSON(chrome.runtime.getManifest().domainUrl+'/bookmark', {key: 'value'}, {'Authorization': 'Bearer ' + data.jwt}).then(function(r) {
                     if (r.status === 200) {
                         console.log(r.json().then(json => console.log(json)))
                         // show bookmark success
@@ -56,7 +56,7 @@ var signout = function() {
 }
 
 document.addEventListener("DOMContentLoaded", function(){
-    var loginUrl = "http://localhost:3000/auth/google?from_extension=" + chrome.runtime.id;
+    var loginUrl = chrome.runtime.getManifest().domainUrl+"/auth/google?from_extension=" + chrome.runtime.id;
     document.querySelector('#sign-in-btn').setAttribute("href", loginUrl);
     document.querySelector('#sign-out-btn').addEventListener('click', signout);
     
