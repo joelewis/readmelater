@@ -12,9 +12,8 @@ import PrismaClient from '@prisma/client'
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import cron from 'node-cron';
 import * as u from './utils.js';
-// Load the AWS SDK for Node.js
-import AWS from 'aws-sdk';
 
 dotenv.config();
 
@@ -253,6 +252,19 @@ app.post('/stopemails', ensureAuthAPI, async function(req, res) {
   res.json(links);
 });
 
+
+app.post('/updatesettings', ensureAuthAPI, async function(req, res) {
+  var unsubscribeUser = req.body.unsubscribeUser;
+  var unsubscribedTags = req.body.unsubscribedTags;
+  var notifyStatus = !unsubscribeUser; // i.e if unsubscribeUser = true; then notifyUser = false;
+  var user = await u.setNotifyStatus(req.user.id, notifyStatus);
+  var tags = await u.setUnsubscribedTags(req.user.id, unsubscribedTags);
+
+  return res.json({
+    user, tags
+  })
+});
+
 app.post('/startemails', ensureAuthAPI, async function(req, res) {
   if (req.body.type === 'user') {
     // stop all email notifications for all links for user
@@ -296,21 +308,11 @@ app.get('/open/:linktoken', async (req, res) => {
   }
 });
 
-// app.post('/markread', async (req, res) => {
-//   var linkId = req.body.id;
-//   try {
-//     await u.markLinkAsRead(linkId);
-//     res.json(true)
-//   } catch(e) {
-//     res.json(false);
-//   }
-// });
-
 app.get('/unsubscribe/:token', async (req, res) => {
   var token = req.params.token;
   var userId = jwt.decode(token, jwtSecret);
   try {
-    await u.stopMailsForUser(userId);
+    await u.setNotifyStatus(userId, false);
   }  catch (e) {
     // notify user that unsubscription failed
   }
@@ -322,13 +324,26 @@ app.get('/sendmail', async (req, res) => {
   res.json({success: true})
 })
 
+app.get('/deleteaccount', ensureAuthAPI, async (req, res) => {
+  var user = req.user;
+  req.logout(); 
+  await u.deleteAccount(user);
+  res.sendFile(path.join( __dirname + '/public/deleted.html'));
+})
+
 // render home page
 app.get('/*', async (req, res) => {
   res.sendFile(path.join( __dirname + '/public/index.html'));
 })
 
 // start cron job
-
+console.log('--------------------------------------');
+console.log('Setting up cron job to run every monday')
+console.log('--------------------------------------');
+cron.schedule('0 7 * * 1', function() {
+  console.log('Running Cron Job -- sending emails');
+  u.sendMails();
+});
 
 
 app.listen(port, '0.0.0.0', () => console.log(`Example app listening at http://localhost:${port}`))

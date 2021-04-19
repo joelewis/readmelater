@@ -39,9 +39,14 @@
               </h5>
 
               <div>  
-                <q-btn unelevated rounded color="dark" label="Install Browser Extension" />
-                <q-btn class="q-ml-lg" unelevated rounded color="red" label="Sign-in Using Google" />
-                <q-btn class="q-ml-lg" unelevated rounded color="light-blue-14" label="Sign-in Using Twitter" />
+                <q-btn icon="login" @click="loginWith('google')" unelevated rounded color="red" label="Sign-in Using Google" />
+                <q-btn class="q-ml-lg" icon="file_download" unelevated rounded color="dark" label="Install Chrome Extension" />
+                <q-btn icon="file_download" class="q-ml-lg" outline rounded :ripple="false" color="dark" label="Install Firefox Extension">
+                    <q-tooltip>
+                       Firefox extension is coming soon.
+                    </q-tooltip>
+                </q-btn>
+                <!-- <q-btn class="q-ml-lg" @click="loginWith('twitter')" unelevated rounded color="light-blue-14" label="Sign-in Using Twitter" /> -->
               </div>
 
               <div class="q-pt-lg">
@@ -142,6 +147,12 @@ export default {
           self.showThankyou = true;
         }, 500)
       }
+    }
+  },
+
+  methods: {
+    loginWith(service) {
+      window.location.href = '/auth/' + service
     }
   }
 }

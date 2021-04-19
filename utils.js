@@ -232,17 +232,6 @@ export const getRemainingDays = (futureDate) => {
     return Math.round(Math.abs((new Date() - futureDate) / oneDay));
 }
 
-export const stopMailsForUser = async (id) => {
-    return await prisma.user.update({
-        where: {
-            id: id
-        },
-        data: {
-            notify: false
-        }
-    })
-}
-
 export const getAllLinksByUser = async (userId, filters) => {
     
     var query = {
@@ -295,6 +284,76 @@ export const getPendingLinksByUser = async (userId) => {
         }
     })
 }
+
+export const setNotifyStatus = async (userId, notify) => {
+    return await prisma.user.update({
+        where: {
+            id: userId
+        },
+        data: {
+            notify: notify
+        }
+    });
+}
+
+export const setUnsubscribedTags = async (userId, tags) => {
+    
+    // first set all tags notify = true, and then selectively set notify = false from tags
+    await prisma.tag.updateMany({
+        where: {
+            userId: userId
+        },
+        data: {
+            notify: true
+        }
+    })
+
+    console.log('settings notify=false for these tags: ', {
+        where: {
+            AND: tags.map(t => ({
+                    userId: userId,
+                    tag: t
+            }))
+        },
+        data: {
+            notify: false
+        }
+    });
+    
+        await prisma.tag.updateMany({
+            where: {
+                OR: tags.map(t => ({
+                    userId: userId,
+                    tag: t
+                }))
+            },
+            data: {
+                notify: false
+            }
+        })
+};
+
+export const deleteAccount = async (user) => {
+    // delete links
+    // delete tags
+    // delete emaillog
+    // delete user
+    await prisma.link.deleteMany({
+        where: {userId: user.id}
+    });
+
+    await prisma.tag.deleteMany({
+        where: {userId: user.id}
+    });
+
+    await prisma.emailLog.deleteMany({
+        where: {userId: user.id}
+    });
+
+    return await prisma.user.delete({
+        where: {id: user.id}
+    });
+};
 
 export const sendMails = async () => {
     // fetch users

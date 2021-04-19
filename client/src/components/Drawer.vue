@@ -2,7 +2,8 @@
   <q-drawer
     v-model="leftDrawerOpen"
     content-class="bg-white"
-    :breakpoint="700"
+    show-if-above
+    :breakpoint="500"
     >
     <q-scroll-area class="fit">
       <q-btn  
@@ -34,9 +35,9 @@
           <div class="flex flex-center q-gutter-xs">
             <router-link class="CTE__drawer-footer-link" to="/privacy" active-class="text-blue-7" aria-label="Privacy">Privacy</router-link>
             <span> · </span>
-            <router-link class="CTE__drawer-footer-link" to="/terms" active-class="text-blue-7" aria-label="Terms">Terms</router-link>
-            <span> · </span>
-            <router-link class="CTE__drawer-footer-link" to="/about" active-class="text-blue-7" aria-label="About">About CloseTab</router-link>
+            <!-- <router-link class="CTE__drawer-footer-link" to="/terms" active-class="text-blue-7" aria-label="Terms">Terms</router-link>
+            <span> · </span> -->
+            <router-link class="CTE__drawer-footer-link" to="/faq" active-class="text-blue-7" aria-label="About">About CloseTab</router-link>
           </div>
         </div>
 

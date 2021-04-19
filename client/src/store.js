@@ -122,7 +122,17 @@ const store = new Vuex.Store({
       } catch (e) {
         console.warn(e);
       }
+    },
+
+    async updateSettings({commit, dispatch}, settings) {
+      try {
+        var resp = await axios.post('/updatesettings', settings)
+        dispatch('fetchTags')
+      } catch (e) {
+        console.warn(e)
+      }
     }
+
   },
   getters: {
     getUser: state => {
@@ -139,6 +149,10 @@ const store = new Vuex.Store({
 
     links: state => {
       return state.links.sort((l1, l2) => { return (new Date(l2.createdAt).getTime() - new Date(l1.createdAt).getTime()) } );
+    },
+
+    unsubscribedTags: state => {
+      return state.tags.filter(t => !t.notify);
     }
   }
 })

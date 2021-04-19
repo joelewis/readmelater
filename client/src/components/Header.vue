@@ -41,6 +41,12 @@
 
                 <q-separator />
 
+                <q-item clickable v-close-popup>
+                  <q-item-section>
+                    <q-item-label>Install Chrome Extension</q-item-label>
+                  </q-item-section>
+                </q-item>
+
                 <q-item clickable v-close-popup to="/account-settings">
                   <q-item-section>
                     <q-item-label>Account Settings</q-item-label>

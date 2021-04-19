@@ -213,7 +213,7 @@ var app = new Vue({
             var self = this;
             setTimeout( () => {
                 self.isLoading = false;
-            }, 900)
+            }, 300)
         },
 
         getTimeoutText: function(timeout) {
