@@ -331,6 +331,10 @@ app.get('/deleteaccount', ensureAuthAPI, async (req, res) => {
   res.sendFile(path.join( __dirname + '/public/deleted.html'));
 })
 
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join( __dirname + '/public/privacy.html'));
+})
+
 // render home page
 app.get('/*', async (req, res) => {
   res.sendFile(path.join( __dirname + '/public/index.html'));

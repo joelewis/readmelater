@@ -346,9 +346,14 @@ export const deleteAccount = async (user) => {
         where: {userId: user.id}
     });
 
-    await prisma.emailLog.deleteMany({
-        where: {userId: user.id}
-    });
+    try {
+        await prisma.emailLog.deleteMany({
+            where: {userId: user.id}
+        });
+    } catch (e) {
+        
+    }
+
 
     return await prisma.user.delete({
         where: {id: user.id}
