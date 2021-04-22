@@ -5,7 +5,7 @@
   "description": "Reading list with reminders",
   "main": "index.js",
   "dependencies": {
-    "@prisma/client": "2.2.2",
+    "@prisma/client": "^2.21.2",
     "@types/node": "12.12.50",
     "aws-sdk": "^2.720.0",
     "body-parser": "1.19.0",
@@ -24,10 +24,10 @@
     "passport-jwt": "^4.0.0"
   },
   "devDependencies": {
-    "@prisma/cli": "^2.2.2",
     "@types/body-parser": "1.19.0",
     "@types/express": "4.17.7",
     "@types/node": "12.12.50",
+    "prisma": "^2.21.2",
     "ts-node": "8.10.2",
     "typescript": "3.9.6"
   },
