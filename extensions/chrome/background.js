@@ -51,9 +51,9 @@ function getJSON(url, headers) {
 }
 
 const ICON_IMG_URL = {
-    BOOKMARKED: 'bookmarked.png',
-    NOT_BOOKMARKED: 'not-bookmarked.png',
-    UNAUTHORIZED: 'login.png',
+    BOOKMARKED: 'img/closetab-bookmarked.png',
+    NOT_BOOKMARKED: 'img/closetab-not-bookmarked.png',
+    UNAUTHORIZED: 'img/closetab.png',
 }
 
 var updateBrowserIcon = function(type, tabId) {

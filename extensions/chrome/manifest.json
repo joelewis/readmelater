@@ -1,18 +1,18 @@
 {
-    "name": "Close Tabs",
+    "name": "Closetab.email",
     "description" : "Close your tabs with confidence. This extension will periodically remind you about your pending reading-list.",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "manifest_version": 2,
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "icons": {
-        "16": "login.png",
-        "48": "login.png",
-        "128": "login.png"
+        "16": "img/closetab-logo.png",
+        "48": "img/closetab-logo.png",
+        "128": "img/closetab-logo.png"
     },
 
     "browser_action": {
-        "default_icon": "login.png",
+        "default_icon": "img/closetab-logo.png",
         "default_title": "CloseTab",
         "default_popup": "index.html"
     },
@@ -29,5 +29,5 @@
     "web_accessible_resources": [
         "login.html"
     ],
-    "domainUrl": "http://localhost:3000"
+    "domainUrl": "https://closetab.email"
 }

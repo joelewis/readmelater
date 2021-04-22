@@ -40,7 +40,7 @@
 
               <div>  
                 <q-btn icon="login" @click="loginWith('google')" unelevated rounded color="red" label="Sign-in Using Google" />
-                <q-btn class="q-ml-lg" icon="file_download" unelevated rounded color="dark" label="Install Chrome Extension" />
+                <q-btn type="a" href="https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb" target="__blank" class="q-ml-lg" icon="file_download" unelevated rounded color="dark" label="Install Chrome Extension" />
                 <q-btn icon="file_download" class="q-ml-lg" outline rounded :ripple="false" color="dark" label="Install Firefox Extension">
                     <q-tooltip>
                        Firefox extension is coming soon.
