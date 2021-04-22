@@ -8,7 +8,7 @@ const prisma = new PrismaClient.PrismaClient();
 AWS.config.update({region: 'us-east-2'});
 
 export const getUserByEmail = async (email) => {
-  return await prisma.user.findOne({
+  return await prisma.user.findUnique({
     where: {
       email: email,
     },
@@ -16,7 +16,7 @@ export const getUserByEmail = async (email) => {
 };
 
 export const getUserById = async (id) => {
-  return await prisma.user.findOne({
+  return await prisma.user.findUnique({
     where: {
       id: id,
     },
@@ -24,7 +24,7 @@ export const getUserById = async (id) => {
 };
 
 export const getTag = async (user, tag) => {
-    return await prisma.tag.findOne({
+    return await prisma.tag.findUnique({
         where: {
           userId_tag: {
               userId: user.id,
@@ -48,7 +48,7 @@ export const createTag = async (user, tag) => {
 }
 
 export const getLinkByHref = async (user, href) => {
-    return await prisma.link.findOne({
+    return await prisma.link.findUnique({
         where: {
             userId_href: {
                 userId: user.id,
@@ -62,7 +62,7 @@ export const getLinkByHref = async (user, href) => {
 }
 
 export const getLinkById = async (id) => {
-    return await prisma.link.findOne({
+    return await prisma.link.findUnique({
         where: {
             id: id
         },
