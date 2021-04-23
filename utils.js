@@ -407,7 +407,8 @@ export const sendMails = async () => {
         var html = await hbs.render('./emailtemplates/weekly_reminder.html', {
             name: user.name,
             links: links,
-            unsubscribeLinkToken: jwt.sign(user.id, process.env.SECRET)
+            unsubscribeLinkToken: jwt.sign(user.id, process.env.SECRET),
+            domain: process.env.DOMAIN_URL
         })
 
         
@@ -415,7 +416,8 @@ export const sendMails = async () => {
         var text = await hbs.render('./emailtemplates/weekly_reminder.txt', {
             name: user.name,
             links: links,
-            unsubscribeLinkToken: jwt.sign(user.id, process.env.SECRET)
+            unsubscribeLinkToken: jwt.sign(user.id, process.env.SECRET),
+            domain: process.env.DOMAIN_URL
         })
 
         console.log(text)

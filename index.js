@@ -310,13 +310,15 @@ app.get('/open/:linktoken', async (req, res) => {
 
 app.get('/unsubscribe/:token', async (req, res) => {
   var token = req.params.token;
-  var userId = jwt.decode(token, jwtSecret);
+  var userId = parseInt(jwt.decode(token, jwtSecret));
   try {
+    console.log('disabling emails for user: ' + userId);
     await u.setNotifyStatus(userId, false);
   }  catch (e) {
     // notify user that unsubscription failed
+    console.log(e)
   }
-  res.redirect('/unsubscribed')
+  res.redirect('/settings')
 });
 
 app.get('/sendmail', async (req, res) => {

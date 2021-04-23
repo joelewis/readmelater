@@ -12,7 +12,7 @@ Here's the list of links you've been meaning to read through this week.
 
 Happy reading!
 
-To stop receiving these emails by visiting: http://closetab.email/unsubscribe/{{unsubscribeLinkToken}}
-You can also stop emails for a tag or a link by configuring your email settings - http://closetab.email/configure/email
+To stop receiving these emails by visiting: {{domain}}/unsubscribe/{{unsubscribeLinkToken}}
+You can also stop emails for a tag or a link by configuring your email settings - {{domain}}/configure/email
 
 

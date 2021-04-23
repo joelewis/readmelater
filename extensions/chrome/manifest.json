@@ -29,5 +29,5 @@
     "web_accessible_resources": [
         "login.html"
     ],
-    "domainUrl": "https://closetab.email"
+    "domainUrl": "http://localhost:3000"
 }
