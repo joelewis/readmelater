@@ -321,11 +321,6 @@ app.get('/unsubscribe/:token', async (req, res) => {
   res.redirect('/settings')
 });
 
-app.get('/sendmail', async (req, res) => {
-  u.sendMails();
-  res.json({success: true})
-})
-
 app.get('/deleteaccount', ensureAuthAPI, async (req, res) => {
   var user = req.user;
   req.logout(); 
