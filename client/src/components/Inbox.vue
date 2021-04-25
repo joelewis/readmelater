@@ -32,6 +32,7 @@
             :disable="!isMultipleSelected(links)"
             label="Mark link as read"
             color="primary"
+            @click="readSelectedLinks"
             >
             <q-tooltip>
               Mark as read
@@ -49,6 +50,7 @@
             label="Delete Link"
             color="negative"
             :disable="!isMultipleSelected(links)"
+            @click="deleteSelectedLinks"
             >
             <q-tooltip>
               Delete
@@ -117,7 +119,7 @@
                 Edit
               </q-tooltip>
             </q-btn>
-            <q-btn @click.stop="deleteLink(link.id)" color="negative" size="sm" outline round icon="delete">
+            <q-btn @click.stop="deleteLinks([link.id])" color="negative" size="sm" outline round icon="delete">
               <q-tooltip>
                 Delete
               </q-tooltip>
@@ -327,8 +329,18 @@ export default {
           this.showNewInput = false;
         },
 
-        deleteLink(linkId) {
-          this.$store.dispatch('deleteLink', linkId);
+        deleteLinks(links) {
+          this.$store.dispatch('deleteLinks', links);
+        },
+
+        deleteSelectedLinks() {
+          var selectedLinks = this.links.filter(l => l.isSelected).map(l => l.id);
+          this.deleteLinks(selectedLinks);
+        },
+
+        readSelectedLinks() {
+          var selectedLinks = this.links.filter(l => l.isSelected).map(l => l.id);
+          this.setNotifyStatus(selectedLinks, false);
         },
 
         setNotifyStatus(links, status) {

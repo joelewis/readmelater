@@ -26,31 +26,25 @@ Here's one version of a bookmarking service that I envison:
 + Most important of all, it shouldn't make me guilty of having a huge list of pending lists.  
 
 
-This project is one initiative on that direction. Most of the above can be acheived with an authentication layer and a very light browser extension and a server process for metrics calculation and sending reminders. 
+This project is one initiative in that direction. Most of the above can be acheived with an authentication layer and a very light browser extension and a server process for metrics calculation and sending reminders. 
 
-
-
+The source code is released under MIT License.
 
 
 ## Setup
 
-1. clone repo
+1. Clone repo
 2. `npm install`
-3. `DEBUG="*" npx prisma migrate save --name init --experimental` to setup migration scripts. 
-4. `DEBUG="*" npx prisma migrate up --experimental` to create the tables. Configure .env file to use different a database.
+3. `cp sample.env .env`
+4. `cp client/sample.env client/.env`
+5.  Edit .env files to configure database, auth keys and other configurations
+3. `DEBUG="*" npx prisma migrate dev --name init` to setup migration scripts and create tables. 
+4. `DEBUG="*" npx prisma generate` to create the tables. 
 5. `cd client`
 6. `npm install` to install client project's dependencies
 7. `yarn build` to build client files and push into ../public folder
-6. `cd .. && node index.js` to run the server
+6. `cd .. && node index.js` to run the server or use your favourite process manager for production
 
-
-##TODO:
-
-/:tag route for listing links based on a tag
-/faq for frequently asked questions
-/privacy page for privacy policy
-/emailsettings page for configuring email notification settings by tag
-make the inbox page look better
 
 
 ## To Debug prisma APIs open node interpreter and paste below code

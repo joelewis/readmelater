@@ -55,6 +55,11 @@ let routes = [
         component: Tags
     },
     {
+        path: '/faq',
+        name: 'faq',
+        component: Faq
+    },
+    {
         path: '/account-settings',
         name: 'accountSettings',
         component: AccountSettings

@@ -36,8 +36,8 @@ const store = new Vuex.Store({
       state.links.push(link);
     },
 
-    deleteLink (state, linkId) {
-      state.links = state.links.filter(l => l.id != linkId);
+    deleteLinks (state, links) {
+      state.links = state.links.filter(l => !links.includes(l.id));
     },
 
     setNotifyStatus (state, {links, status}) {
@@ -106,10 +106,10 @@ const store = new Vuex.Store({
       }
     },
 
-    async deleteLink({commit}, linkId) {
+    async deleteLinks({commit}, links) {
       try {
-        var resp = await axios.delete('/bookmark', {data: {id: linkId}})
-        commit('deleteLink', linkId);
+        var resp = await axios.delete('/bookmark', {data: {links: links}})
+        commit('deleteLinks', links);
       } catch (e) {
         console.warn(e);
       }

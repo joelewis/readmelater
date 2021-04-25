@@ -20,42 +20,50 @@
         <q-space />
 
         <div class="q-gutter-sm row items-center no-wrap">
-          <q-btn unelevated round :label="user.name[0]"
-            color="orange"
-            text-color="grey-1"
+          <q-btn bordered outline icon-right="expand_more" no-caps :label="user.name"
            >
-            <q-menu>
-              <q-list>
+
+
+            <q-menu dark>
+              <q-list style="min-width:300px;" dark>
                 <q-item  v-close-popup>
                   <q-item-section avatar>
-                    <q-avatar color="orange" text-color="white">
-                      {{ user.name[0] }}
-                    </q-avatar>
+                      <q-icon name="account_circle" />
                   </q-item-section>
 
                   <q-item-section>
-                    <q-item-label>{{ user.name }}</q-item-label>
+                    <q-item-label class="text-subtitle2">{{ user.name }}</q-item-label>
                     <q-item-label caption lines="1">{{ user.email }}</q-item-label>
                   </q-item-section>
                 </q-item>
 
                 <q-separator />
 
-                <q-item clickable v-close-popup>
+                <q-item clickable @click="gotoExtension" v-close-popup>
+                  <q-item-section avatar class="q-pr-xs">
+                    <q-icon name="file_download" />
+                  </q-item-section>
                   <q-item-section>
-                    <q-item-label>Install Chrome Extension</q-item-label>
+                    <q-item-label class="text-body2"> Install Chrome Extension</q-item-label>
                   </q-item-section>
                 </q-item>
+                
 
-                <q-item clickable v-close-popup to="/account-settings">
+                <q-item clickable v-close-popup to="/settings">
+                  <q-item-section avatar class="q-pr-xs">
+                    <q-icon name="settings" />
+                  </q-item-section>
                   <q-item-section>
-                    <q-item-label>Account Settings</q-item-label>
+                    <q-item-label class="text-body2">Account Settings</q-item-label>
                   </q-item-section>
                 </q-item>
 
                 <q-item clickable v-close-popup tag="a" href="/logout">
+                  <q-item-section avatar class="q-pr-xs">
+                    <q-icon name="logout" />
+                  </q-item-section>
                   <q-item-section>
-                    <q-item-label>Logout</q-item-label>
+                    <q-item-label class="text-body2">Logout</q-item-label>
                   </q-item-section>                
                 </q-item>
               </q-list>
@@ -81,6 +89,10 @@ export default {
     methods: {
         toggleDrawer() {
             this.$store.dispatch('toggleDrawerStatus')
+        },
+
+        gotoExtension() {
+          window.open('https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb')
         }
     }
 }

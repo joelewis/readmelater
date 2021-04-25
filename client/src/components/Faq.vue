@@ -16,7 +16,7 @@
       <p> Yes, you can unsubscribe your account from the mailing list or selectively disable emails for certain tags.</p>
 
       <p><b> Where can I register my feedbacks/issues </b></p>
-      <p> You can shoot an email to joe@closetab.email for any feedback and issue reporting. </p>
+      <p> Please drop your comments and feedbacks to <a href="mailto:joe@closetab.email">joe@closetab.email</a>. </p>
         </div>
       </div>
     </q-page>

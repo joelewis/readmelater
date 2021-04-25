@@ -226,9 +226,9 @@ app.get('/is/bookmarked', ensureAuthAPI, async function(req, res) {
 });
 
 app.delete('/bookmark', ensureAuthAPI, async (req, res) => {
-  var linkId = req.body.id;
+  var links = req.body.links;
   try {
-    await u.deleteLinkById(linkId);
+    await Promise.all(links.map(linkId => u.deleteLinkById(linkId)))
     res.json(true)
   } catch(e) {
     res.json(false);
