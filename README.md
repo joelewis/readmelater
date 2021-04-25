@@ -29,6 +29,17 @@ Here's one version of a bookmarking service that I envison:
 This project is one initiative in that direction. Most of the above can be acheived with an authentication layer and a very light browser extension and a server process for metrics calculation and sending reminders. 
 
 
+## LICENSE
+
+The source code is released under MIT License. 
+
+
+## Contributors
+
++ [Karthikeyan](http://karthyk.dev) - Thank you for helping me develop the chrome extension and designing a quick UX for the inbox view!
++ [Joe Lewis](http://joe-lewis.com)  
+
+
 ## Setup
 
 1. Clone repo
@@ -53,14 +64,3 @@ const prisma = new PrismaClient.PrismaClient();
 var pp = function(promise) { promise.then(r => console.log(r)) }
 pp(prisma.link.findMany())
 ```
-
-## LICENSE
-
-The source code is released under MIT License. 
-
-
-## Contributors
-
-+ [Karthikeyan](http://karthyk.dev) - Thank you for helping me develop the chrome extension and designing a quick UX for the inbox view!
-+ [Joe Lewis](http://joe-lewis.com)  
-
