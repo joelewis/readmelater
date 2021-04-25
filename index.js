@@ -271,7 +271,7 @@ app.post('/startemails', ensureAuthAPI, async function(req, res) {
   } else if (req.body.type === 'link') {
     var links = req.body.links;
     var links = await Promise.all(links.map(async (linkId) => {
-      return u.markLinkAsUnread(linkId)
+      return u.markLinkAsUnread(linkId, req.user)
     }))
     // stop email notifications for these links
   } else if (req.body.type === 'tag') {

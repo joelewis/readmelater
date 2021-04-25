@@ -73,10 +73,11 @@ export const getLinkById = async (id) => {
 }
 
 export const deleteLinkById = async (id, user) => {
+    var link = await getLinkById(id);
+    if (link.userId != user.id) { throw new Error('user not authorized to access this API') }
     return await prisma.link.delete({
         where: {
-            id: id,
-            userId: user.id
+            id: id
         }
     })
 }
@@ -93,18 +94,14 @@ export const markLinkAsReadById = async (id) => {
 }
 
 export const markLinkAsRead = async (id, user) => {
-    return await prisma.link.update({
-        where: {
-            id: id,
-            userId: user.id
-        },
-        data: {
-            notify: false
-        }
-    })
+    var link = await getLinkById(id);
+    if (link.userId != user.id) { throw new Error('user not authorized to access this API') }
+    return await markLinkAsReadById(id)
 }
 
-export const markLinkAsUnread = async (id) => {
+export const markLinkAsUnread = async (id, user) => {
+    var link = await getLinkById(id);
+    if (link.userId != user.id) { throw new Error('user not authorized to access this API') }
     return await prisma.link.update({
         where: {
             id: id
