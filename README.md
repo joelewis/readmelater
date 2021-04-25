@@ -52,7 +52,7 @@ var PrismaClient = require('@prisma/client')
 const prisma = new PrismaClient.PrismaClient();
 var pp = function(promise) { promise.then(r => console.log(r)) }
 pp(prisma.link.findMany())
-
+```
 
 ## LICENSE
 
