@@ -28,8 +28,6 @@ Here's one version of a bookmarking service that I envison:
 
 This project is one initiative in that direction. Most of the above can be acheived with an authentication layer and a very light browser extension and a server process for metrics calculation and sending reminders. 
 
-The source code is released under MIT License.
-
 
 ## Setup
 
@@ -44,6 +42,7 @@ The source code is released under MIT License.
 6. `npm install` to install client project's dependencies
 7. `yarn build` to build client files and push into ../public folder
 6. `cd .. && node index.js` to run the server or use your favourite process manager for production
+7. The reminder emails use AWS SES service in production. You might want to override it with your own service/implementation. Look at `mail()` function from `utils.js`. If you do intend to use AWS SES, sign up for an AWS account and manage your API keys as suggested by AWS - either by dropping your keys in .env file or creating ~/.aws/credentials file with keys.
 
 
 
@@ -53,4 +52,15 @@ var PrismaClient = require('@prisma/client')
 const prisma = new PrismaClient.PrismaClient();
 var pp = function(promise) { promise.then(r => console.log(r)) }
 pp(prisma.link.findMany())
+
+
+## LICENSE
+
+The source code is released under MIT License. 
+
+
+## Contributors
+
++ [Karthikeyan](http://karthyk.dev) - Thank you for helping me develop the chrome extension and designing a quick UX for the inbox view!
++ [Joe Lewis](http://joe-lewis.com)  
 

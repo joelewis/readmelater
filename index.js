@@ -228,7 +228,7 @@ app.get('/is/bookmarked', ensureAuthAPI, async function(req, res) {
 app.delete('/bookmark', ensureAuthAPI, async (req, res) => {
   var links = req.body.links;
   try {
-    await Promise.all(links.map(linkId => u.deleteLinkById(linkId)))
+    await Promise.all(links.map(linkId => u.deleteLinkById(linkId, req.user)))
     res.json(true)
   } catch(e) {
     res.json(false);
@@ -242,7 +242,7 @@ app.post('/stopemails', ensureAuthAPI, async function(req, res) {
   } else if (req.body.type === 'link') {
     var links = req.body.links;
     var links = await Promise.all(links.map(async (linkId) => {
-      return u.markLinkAsRead(linkId)
+      return u.markLinkAsRead(linkId, req.user)
     }))
     // stop email notifications for these links
   } else if (req.body.type === 'tag') {
@@ -300,7 +300,7 @@ app.get('/open/:linktoken', async (req, res) => {
   try {
     linkId = parseInt(linkId);
     var link = await u.getLinkById(linkId);
-    await u.markLinkAsRead(linkId);
+    await u.markLinkAsReadById(linkId);
     res.redirect(link.href);
   } catch (e) {
     console.error(e, e.stack);

@@ -72,18 +72,31 @@ export const getLinkById = async (id) => {
     })
 }
 
-export const deleteLinkById = async (id) => {
+export const deleteLinkById = async (id, user) => {
     return await prisma.link.delete({
         where: {
-            id: id
+            id: id,
+            userId: user.id
         }
     })
 }
 
-export const markLinkAsRead = async (id) => {
+export const markLinkAsReadById = async (id) => {
     return await prisma.link.update({
         where: {
             id: id
+        },
+        data: {
+            notify: false
+        }
+    })
+}
+
+export const markLinkAsRead = async (id, user) => {
+    return await prisma.link.update({
+        where: {
+            id: id,
+            userId: user.id
         },
         data: {
             notify: false
