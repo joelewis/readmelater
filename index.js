@@ -26,8 +26,6 @@ var ExtractJwt = PassportJwt.ExtractJwt;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID; 
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
-console.log(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
-
 var GoogleStrategy = PassportGoogleOauth.OAuth2Strategy;
 
 const __filename = fileURLToPath(import.meta.url);
@@ -216,8 +214,6 @@ app.get('/is/bookmarked', ensureAuthAPI, async function(req, res) {
   var href = decodeURIComponent(req.query.href); 
   var link = href ? await u.getLinkByHref(req.user, href) : null;
 
-  console.log(link, href)
-
   if (link) {
     return res.json(link);
   } else {
@@ -284,7 +280,6 @@ app.post('/startemails', ensureAuthAPI, async function(req, res) {
 app.get('/links', ensureAuthAPI, async function(req, res) {
   // fetch all links for the user
   var filter = req.query.filter && JSON.parse(req.query.filter)
-  console.log(filter);
   var links = await u.getAllLinksByUser(req.user.id, filter || {});
   res.json(links);
 });
@@ -355,4 +350,4 @@ cron.schedule('0 7 * * 1', function() {
 });
 
 
-app.listen(port, '0.0.0.0', () => console.log(`Example app listening at http://localhost:${port}`))
+app.listen(port, '0.0.0.0', () => console.log(`Listening at http://localhost:${port}`))
