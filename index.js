@@ -332,6 +332,14 @@ app.get('/privacy', (req, res) => {
   res.sendFile(path.join( __dirname + '/public/privacy.html'));
 })
 
+
+app.get('/vote', (req, res) => {
+  // dummy end point for recording interests in paid plan. 
+  // I'm not interested in throwing in an website analystics tool now - largely due to privacy concerns.
+  // I'm hoping this request will get logged by cloudfare and I can use cloudflare analytics to look at this data
+  res.send('Thanks')
+})
+
 // render home page
 app.get('/*', async (req, res) => {
   res.sendFile(path.join( __dirname + '/public/index.html'));

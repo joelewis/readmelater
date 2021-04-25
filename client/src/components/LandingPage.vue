@@ -146,7 +146,6 @@
 
 <script>
 
-
 export default {
 
   components: {
@@ -165,6 +164,7 @@ export default {
   watch: {
     willPay: function(newVal) {
       if (newVal) {
+        this.sendVote();
         var self = this;
         setTimeout(() => {
           self.showThankyou = true;
@@ -176,6 +176,10 @@ export default {
   methods: {
     loginWith(service) {
       window.location.href = '/auth/' + service
+    },
+
+    sendVote() {
+      fetch('/vote')
     }
   }
 }

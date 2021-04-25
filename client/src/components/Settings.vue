@@ -94,10 +94,8 @@ export default {
   created: async function() {
       try {
         await this.$store.dispatch('fetchTags')
-        console.log(this.$store.state.tags)
         this.tagOptions = this.$store.state.tags.map(t => t.tag);
         this.tags = this.$store.state.tags.filter(t => !t.notify).map(t => t.tag);
-        console.log(this.tags);
       } catch (e) {
       }
   },
