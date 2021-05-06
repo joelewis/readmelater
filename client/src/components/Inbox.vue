@@ -315,7 +315,7 @@ export default {
 
         openEditDialog(link) {
           this.newlink.href=  link.href;
-          this.newlink.tags = link.tags || [];
+          this.newlink.tags = link.tags.map(t => t.tag) || [];
           this.showNewInput = true;
         },
 
