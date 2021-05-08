@@ -179,7 +179,6 @@
 
           </q-card-section>
           <q-separator />
-
           <q-card-actions align="right" class="q-pa-lg">
             <q-btn no-caps class="q-pr-md" unelevated size="md" dense color="primary" icon="done" label="Save Link" @click="addLink"/>
             <q-btn flat no-caps dense size="md" color="primary" icon="close" label="Cancel" v-close-popup @click="goback" />

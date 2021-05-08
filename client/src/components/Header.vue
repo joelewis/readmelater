@@ -18,7 +18,7 @@
         </q-toolbar-title>
 
         <q-space />
-
+        <a href="https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb" class="q-pr-lg">Install chrome extension for quickly adding links </a>
         <div class="q-gutter-sm row items-center no-wrap">
           <q-btn bordered outline icon-right="expand_more" no-caps :label="user.name"
            >

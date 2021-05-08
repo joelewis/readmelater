@@ -35,8 +35,8 @@
           <div class="flex flex-center q-gutter-xs">
             <router-link class="CTE__drawer-footer-link" to="/privacy" active-class="text-blue-7" aria-label="Privacy">Privacy</router-link>
             <span> · </span>
-            <!-- <router-link class="CTE__drawer-footer-link" to="/terms" active-class="text-blue-7" aria-label="Terms">Terms</router-link>
-            <span> · </span> -->
+            <a class="CTE__drawer-footer-link" target="_blank" href="https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb" active-class="text-blue-7" aria-label="Terms">Extension</a>
+            <span> · </span>
             <router-link class="CTE__drawer-footer-link" to="/faq" active-class="text-blue-7" aria-label="About">About CloseTab</router-link>
           </div>
         </div>

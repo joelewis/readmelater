@@ -1,6 +1,12 @@
 Hello {{ name }},
 <br>
 
+{{#if nolinks}}
+<p>This is a weekly reminder email from closetab.email to help you finish your reading list.<br>
+You have nothing pending to read, which is great! You are all set to add new stuff to read. <br>
+<a href="https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb">Tip: Use this browser extension to quickly add links to your reading list. </a>
+</p>
+{{else}}
 <p>This is a weekly reminder email from closetab.email to help you finish your reading list.<br>
 Here's the list of links you've been meaning to read through this week.</p>
 
@@ -11,11 +17,11 @@ Here's the list of links you've been meaning to read through this week.</p>
 {{#if isTagged}}{{#each tags}}<a href="#">#{{tag}}</a>{{#if @last}}&nbsp;{{else}},&nbsp;{{/if}}{{/each}}{{/if}}
 {{/each}}
 
-
 <p>Happy reading!</p>
 
 <br>
+{{/if}}
 <p>To stop receiving these emails <a href="{{domain}}/unsubscribe/{{unsubscribeLinkToken}}">click here</a>.<br>
 You can also stop emails for a tag or a link by <a href="{{domain}}/settings">configuring your email settings.</a></p>
-
+<p><a href="https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb">Install chrome extension to add links quickly</a> | <a href="https://closetab.email"> https://closetab.email </a> </p>
 

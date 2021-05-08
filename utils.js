@@ -411,12 +411,13 @@ export const sendMails = async () => {
 
         if (!links.length) {
             console.log('no links to send emails to: ' + user.email);
-            return; // no links to send email for
+            // return; // no links to send email for
         }
 
         var html = await hbs.render('./emailtemplates/weekly_reminder.html', {
             name: user.name,
             links: links,
+            nolinks: !links.length,
             unsubscribeLinkToken: jwt.sign(user.id, process.env.SECRET),
             domain: process.env.DOMAIN_URL
         })
@@ -426,6 +427,7 @@ export const sendMails = async () => {
         var text = await hbs.render('./emailtemplates/weekly_reminder.txt', {
             name: user.name,
             links: links,
+            nolinks: !links.length,
             unsubscribeLinkToken: jwt.sign(user.id, process.env.SECRET),
             domain: process.env.DOMAIN_URL
         })

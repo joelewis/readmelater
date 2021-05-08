@@ -1,5 +1,12 @@
 Hello {{ name }},
 
+
+{{#if nolinks}}
+This is a weekly reminder email from closetab.email to help you finish your reading list.
+You have nothing pending to read, which is great! You are all set to add new stuff to read.
+Tip: Use this browser extension to quickly add links to your reading list - https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb
+{{else}}
+
 This is a weekly reminder email from closetab.email to help you finish your reading list.
 Here's the list of links you've been meaning to read through this week.
 
@@ -9,6 +16,7 @@ Here's the list of links you've been meaning to read through this week.
 {{#if isTagged}}{{#each tags}} #{{tag}} {{/each}}{{/if}}
 {{/each}}
 
+{{/if}}
 
 Happy reading!
 
