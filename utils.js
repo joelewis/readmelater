@@ -435,7 +435,7 @@ export const sendMails = async () => {
         console.log(text)
 
         // send email to users
-        var result = mail(
+        var result = await mail(
             "digest@closetab.email",
             user.email,
             "CloseTab.email - stuff to read this week.",
@@ -443,21 +443,19 @@ export const sendMails = async () => {
             html
         )
 
-        if (result.MessageId) {
-            // record mail delivery
-            await prisma.emailLog.create({
-                data: {
-                    user: {
-                        connect: {
-                            id: user.id
-                        }
-                    },
-                    html: html,
-                    text: text,
-                    mailId: result.MessageId
-                }
-            })
-        }
+        // record mail delivery
+        await prisma.emailLog.create({
+            data: {
+                user: {
+                    connect: {
+                        id: user.id
+                    }
+                },
+                html: html,
+                text: text,
+                mailId: result.MessageId || ''
+            }
+        })
 
     })
 }
