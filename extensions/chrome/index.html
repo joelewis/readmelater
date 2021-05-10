@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="css/vendor/bootstrap.css">
     <link rel="stylesheet/less" type="text/css" href="less/index.less" />
+    <script type="application/javascript" src="browser-polyfill.min.js"></script>
     <title></title>
   </head>
   <body class="ct-popup-wrapper">
@@ -16,20 +17,20 @@
       <!-- <div class="ct-loader text-center" v-show="isLoading">
         <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
       </div> -->
-      
+
       <template v-if="!isLoggedIn">
         <div class="ct-social-login-buttons">
-          <a 
-            class="btn btn-primary btn-google" 
-            :href="domainUrl + `/auth/google?from_extension=${chromeRunTimeId}`"
+          <a
+            class="btn btn-primary btn-google"
+            :href="domainUrl + `/auth/google?from_extension_url=${extensionURL}`"
             target="_blank"
             >
             <img src="img/social-icons/google.png" class="img-responsive" />
             Login with Google
           </a>
 
-          <!-- <a 
-            class="btn btn-primary btn-twitter" 
+          <!-- <a
+            class="btn btn-primary btn-twitter"
             href="#"
             target="_blank"
             >
@@ -67,9 +68,9 @@
               <vue-tags-input
                 v-model="tag"
                 :tags="tags"
-                :autocomplete-items="filteredTags" 
+                :autocomplete-items="filteredTags"
                 @tags-changed="updateBookmarkTags"
-              ></vue-tags-input>  
+              ></vue-tags-input>
               <small class="form-text text-muted">Add tags separated by space or comma</small>
             </div>
           </div>
@@ -78,7 +79,7 @@
         <div v-show="isLoading" class="ct-bookmark-status-card" style="font-size:0.8em;padding:0;">
           <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
         </div>
-        
+
         <ul class="ct-options">
           <li @click="viewAllLinks">View All Bookmarks</li>
           <li @click="signOut">Log out</li>
@@ -86,7 +87,7 @@
       </template>
 
     </div>
-    
+
     <script src="js/vendor/jquery.min.js"></script>
     <script src="js/vendor/popper.min.js"></script>
     <script src="js/vendor/bootstrap.min.js"></script>
