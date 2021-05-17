@@ -108,3 +108,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+.web-extension-id
+web-ext-artifacts
+.DS_Store

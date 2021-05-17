@@ -23,7 +23,7 @@ var JWTstrategy = PassportJwt.Strategy;
 var ExtractJwt = PassportJwt.ExtractJwt;
 
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID; 
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 var GoogleStrategy = PassportGoogleOauth.OAuth2Strategy;
@@ -35,7 +35,7 @@ const app = express()
 const port = process.env.PORT || 3000 // import from env
 const jwtSecret = process.env.SECRET; // import from env
 
-app.use(session({ 
+app.use(session({
   secret: process.env.SECRET,
   store: new SQLiteStore()
 })); // import from env
@@ -52,10 +52,10 @@ app.use(cors())
 //   credentials (in this case, an accessToken, refreshToken, and Google
 //   profile), and invoke a callback with a user object.
 passport.use('google', new GoogleStrategy({
-    clientID: GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.DOMAIN_URL + "/auth/google/callback"
-  },
+  clientID: GOOGLE_CLIENT_ID,
+  clientSecret: GOOGLE_CLIENT_SECRET,
+  callbackURL: process.env.DOMAIN_URL + "/auth/google/callback"
+},
   async function(accessToken, refreshToken, profile, done) {
     var email = profile._json.email;
     var name = profile._json.name;
@@ -63,7 +63,7 @@ passport.use('google', new GoogleStrategy({
     const user = await u.getUserByEmail(email);
 
     if (user) {
-        return done(null, user);
+      return done(null, user);
     }
 
     try {
@@ -89,8 +89,8 @@ passport.use(
   new JWTstrategy(opts, async (jwt_payload, done) => {
     try {
       const user = await u.getUserById(jwt_payload.id);
-      if (user) { 
-        return done(null, user) 
+      if (user) {
+        return done(null, user)
       } else {
         done(null, false)
       }
@@ -112,7 +112,7 @@ const ensureAuthAPI = (req, res, next) => {
   if (req.user) {
     next();
   } else {
-    passport.authenticate('jwt', {session: false, failureMessage: 'invalid token'})(req, res, next)
+    passport.authenticate('jwt', { session: false, failureMessage: 'invalid token' })(req, res, next)
   }
 };
 
@@ -124,7 +124,7 @@ passport.deserializeUser(async function(id, done) {
   try {
     const user = await u.getUserById(id);
     done(null, user)
-  } catch(e) {
+  } catch (e) {
     done(e);
   }
 });
@@ -134,7 +134,7 @@ app.use('/static', express.static('public'))
 
 
 
-app.get('/logout', function(req, res){
+app.get('/logout', function(req, res) {
   req.logout();
   res.redirect('/');
 });
@@ -151,6 +151,9 @@ app.get('/auth/google', (req, res, next) => {
   if (req.query.from_extension) {
     req.session.from_extension = req.query.from_extension;
   }
+  if (req.query.from_extension_url) {
+    req.session.from_extension_url = req.query.from_extension_url;
+  }
   passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile'] })(req, res, next)
 });
 
@@ -159,28 +162,33 @@ app.get('/auth/google', (req, res, next) => {
 //   request.  If authentication fails, the user will be redirected back to the
 //   login page.  Otherwise, the primary route function function will be called,
 //   which, in this example, will redirect the user to the home page.
-app.get('/auth/google/callback', 
+app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
     const redirect = req.session.returnTo;
     delete req.session.returnTo;
 
-    if (req.session.from_extension) {
+    if (req.session.from_extension_url) {
+      var extension_url = `${req.session.from_extension_url}login.html`
+      delete req.session.from_extension_url
+      // redirect to extension's url with jwt token in get param
+      res.redirect(extension_url + '?token=' + jwt.sign({ id: req.user.id }, jwtSecret, { expiresIn: '7d' }));
+    } else if (req.session.from_extension) {
       var extension_url = `chrome-extension://${req.session.from_extension}/login.html`
       delete req.session.from_extension
       // redirect to extension's url with jwt token in get param
-      res.redirect(extension_url + '?token=' + jwt.sign({id: req.user.id}, jwtSecret, {expiresIn: '7d'}));
+      res.redirect(extension_url + '?token=' + jwt.sign({ id: req.user.id }, jwtSecret, { expiresIn: '7d' }));
     } else {
       res.redirect(redirect || '/');
     }
-    
-});
+
+  });
 
 app.get('/token',
   ensureAuthAPI,
   function(req, res) {
-    var token = jwt.sign({id: req.user.id}, jwtSecret, {expiresIn: '7d'});
-    res.json({token: token});
+    var token = jwt.sign({ id: req.user.id }, jwtSecret, { expiresIn: '7d' });
+    res.json({ token: token });
   })
 
 app.get('/session',
@@ -193,7 +201,7 @@ app.get('/session',
 app.post('/bookmark', ensureAuthAPI, async function(req, res) {
   var href = req.body.href;
   if (!href) {
-    return res.status(400).json({error: "missing href"})
+    return res.status(400).json({ error: "missing href" })
   }
 
   var timeout = req.body.timeout;
@@ -206,12 +214,12 @@ app.post('/bookmark', ensureAuthAPI, async function(req, res) {
   var tags = req.body.tags || [];
 
   var link = await u.addLink(req.user, href, timeout, tags);
-  
+
   res.json(link);
 });
 
 app.get('/is/bookmarked', ensureAuthAPI, async function(req, res) {
-  var href = decodeURIComponent(req.query.href); 
+  var href = decodeURIComponent(req.query.href);
   var link = href ? await u.getLinkByHref(req.user, href) : null;
 
   if (link) {
@@ -226,10 +234,10 @@ app.delete('/bookmark', ensureAuthAPI, async (req, res) => {
   try {
     await Promise.all(links.map(linkId => u.deleteLinkById(linkId, req.user)))
     res.json(true)
-  } catch(e) {
+  } catch (e) {
     res.json(false);
   }
-  
+
 })
 
 app.post('/stopemails', ensureAuthAPI, async function(req, res) {
@@ -290,7 +298,7 @@ app.get('/tags', ensureAuthAPI, async function(req, res) {
 });
 
 app.get('/open/:linktoken', async (req, res) => {
-  var linktoken =  req.params.linktoken;
+  var linktoken = req.params.linktoken;
   var linkId = jwt.decode(linktoken, jwtSecret);
   try {
     linkId = parseInt(linkId);
@@ -309,7 +317,7 @@ app.get('/unsubscribe/:token', async (req, res) => {
   try {
     console.log('disabling emails for user: ' + userId);
     await u.setNotifyStatus(userId, false);
-  }  catch (e) {
+  } catch (e) {
     // notify user that unsubscription failed
     console.log(e)
   }
@@ -318,18 +326,18 @@ app.get('/unsubscribe/:token', async (req, res) => {
 
 app.get('/deleteaccount', ensureAuthAPI, async (req, res) => {
   var user = req.user;
-  req.logout(); 
+  req.logout();
   await u.deleteAccount(user);
-  res.sendFile(path.join( __dirname + '/public/deleted.html'));
+  res.sendFile(path.join(__dirname + '/public/deleted.html'));
 })
 
 app.get('/privacy', (req, res) => {
-  res.sendFile(path.join( __dirname + '/public/privacy.html'));
+  res.sendFile(path.join(__dirname + '/public/privacy.html'));
 })
 
 
 app.get('/vote', (req, res) => {
-  // dummy end point for recording interests in paid plan. 
+  // dummy end point for recording interests in paid plan.
   // I'm not interested in throwing in an website analystics tool now - largely due to privacy concerns.
   // I'm hoping this request will get logged by cloudfare and I can use cloudflare analytics to look at this data
   res.send('Thanks')
@@ -337,7 +345,7 @@ app.get('/vote', (req, res) => {
 
 // render home page
 app.get('/*', async (req, res) => {
-  res.sendFile(path.join( __dirname + '/public/index.html'));
+  res.sendFile(path.join(__dirname + '/public/index.html'));
 })
 
 // start cron job

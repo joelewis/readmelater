@@ -2,13 +2,13 @@
 const ICON_IMG_URL = {
     BOOKMARKED: 'img/closetab-bookmarked.png',
     NOT_BOOKMARKED: 'img/closetab-not-bookmarked.png',
-    UNAUTHORIZED: 'img/closetab.png',
+    UNAUTHORIZED: 'img/closetab-logo.png',
 }
 
 var updateBrowserIcon = function(type, tabId) {
     console.log(type, tabId);
-    chrome.browserAction.setIcon({
-        path: ICON_IMG_URL[type], 
+    browser.browserAction.setIcon({
+        path: ICON_IMG_URL[type],
         tabId: tabId
     });
 }
@@ -31,13 +31,14 @@ Vue.component('top-bar', {
 
 var app = new Vue({
     el: '#app',
-    
+
     data: {
         isLoggedIn: false,
-        chromeRunTimeId: chrome.runtime.id,
+        chromeRunTimeId: browser.runtime.id,
+        extensionURL: browser.extension.getURL("/"),
         tag: '',
         tags: [],
-        bookmark: {href: '', timeout: '2w', tags: []},
+        bookmark: { href: '', timeout: '2w', tags: [] },
         tagOptions: [],
         isLoading: false,
         domainUrl: getDomainUrl(),
@@ -57,22 +58,19 @@ var app = new Vue({
 
     beforeCreate: function() {
         var self = this;
-        chrome.windows.getCurrent(function(w) {
-            chrome.tabs.getSelected(w.id,
-            function (tab){
-                self.tabId = tab.id;
-                chrome.storage.local.get('jwt', function(data) {
-                    if (data.jwt) {
-                        self.isLoggedIn = true;
-                        self.jwt = data.jwt;
-                    } else {
-                        self.isLoggedIn = false;
-                        updateBrowserIcon('UNAUTHORIZED', self.tabId)
-                    }
-                });
+        browser.tabs.query({ active: true, currentWindow: true }).then(function(tabs) {
+            self.tabId = tabs[0].id;
+            browser.storage.local.get('jwt').then(function(data) {
+                if (data.jwt) {
+                    self.isLoggedIn = true;
+                    self.jwt = data.jwt;
+                } else {
+                    self.isLoggedIn = false;
+                    updateBrowserIcon('UNAUTHORIZED', self.tabId)
+                }
             });
         });
-        
+
     },
 
     mounted() {
@@ -93,10 +91,10 @@ var app = new Vue({
     },
 
     methods: {
-        signOut: function() {         
+        signOut: function() {
             // Removing the token from chrome local
-            // store and showing the loggin screen   
-            chrome.storage.local.remove('jwt');
+            // store and showing the loggin screen
+            browser.storage.local.remove('jwt');
             this.isLoggedIn = false
         },
 
@@ -105,13 +103,13 @@ var app = new Vue({
                 return tag.text.split(/[,\s]+/)
                     .map(v => v.trim())
                     .filter(v => v.length > 0)
-                    .map(v => v.startsWith('#') ? v.substring(1): v)
+                    .map(v => v.startsWith('#') ? v.substring(1) : v)
             }).flat();
-            
+
             this.tags = Array.from(new Set(tags));
 
             this.bookmark.tags = this.tags;
-            
+
             this.updateBookmark()
         },
 
@@ -123,12 +121,12 @@ var app = new Vue({
         getTags: function(jwt) {
             var self = this;
             self.stopLoading();
-            getReq(this.domainUrl + '/tags', {'Authorization': 'Bearer ' + jwt }).then(resp => {
+            getReq(this.domainUrl + '/tags', { 'Authorization': 'Bearer ' + jwt }).then(resp => {
                 self.isLoading = false;
                 return resp.json()
             }).then(resp => {
                 self.tagOptions = resp.map(t => {
-                    return {text: t.tag }
+                    return { text: t.tag }
                 });
             })
         },
@@ -137,31 +135,31 @@ var app = new Vue({
             var self = this
             self.isLoading = true
             self.bookmark.href = url;
-            postJSON(this.domainUrl + '/bookmark', self.bookmark , {'Authorization': 'Bearer ' + jwt }).then(function(r) {
+            postJSON(this.domainUrl + '/bookmark', self.bookmark, { 'Authorization': 'Bearer ' + jwt }).then(function(r) {
                 self.stopLoading();
                 if (r.status === 200) {
                     // show bookmark success
                     r.json().then(json => {
-                        self.isLoggedIn = true    
+                        self.isLoggedIn = true
                         self.currentPageBookmarked = true;
                         self.bookmark.timeout_date = json.timeout;
                         console.log('updating icon to bookmarked for tab: ' + self.tabId);
                         updateBrowserIcon('BOOKMARKED', self.tabId)
                     })
-                } else if (r.statue === 401){
+                } else if (r.statue === 401) {
                     // show logged out ui
-                    self.isLoggedIn = false      
-                    updateBrowserIcon('UNAUTHORIZED', self.tabId)              
+                    self.isLoggedIn = false
+                    updateBrowserIcon('UNAUTHORIZED', self.tabId)
                 } else {
                     updateBrowserIcon('NOT_BOOKMARKED', self.tabId)
                 }
-                
+
             })
         },
 
         initBookmark: function() {
             var self = this;
-            chrome.tabs.get(this.tabId, function(tab) {
+            browser.tabs.get(this.tabId).then(function(tab) {
                 self.bookmark.href = tab.url
                 self.tabId = tab.id;
                 self.getOrSaveBookmark(self.jwt, tab.url)
@@ -171,7 +169,7 @@ var app = new Vue({
         getOrSaveBookmark: function(jwt, url) {
             var self = this;
             this.isLoading = true;
-            getReq(chrome.runtime.getManifest().domainUrl + `/is/bookmarked?href=${encodeURIComponent(url)}`, {'Authorization': 'Bearer ' + jwt}).then(r => {
+            getReq(browser.runtime.getManifest().domainUrl + `/is/bookmarked?href=${encodeURIComponent(url)}`, { 'Authorization': 'Bearer ' + jwt }).then(r => {
                 this.isLoading = false;
                 if (r.status === 200) {
                     // bookmark already exists, just update client data with server data
@@ -188,7 +186,7 @@ var app = new Vue({
                 } else if (r.status === 401) {
                     // unauthorized, just show logged out ui
                     this.isLoggedIn = false;
-                    updateBrowserIcon('UNAUTHORIZED', self.tabId)  
+                    updateBrowserIcon('UNAUTHORIZED', self.tabId)
                 } else {
                     // not yet bookmarked
                     this.isLoggedIn = true;
@@ -201,17 +199,17 @@ var app = new Vue({
         getRemainingTime: function(datestring) {
             var date = new Date(datestring);
             var today = new Date();
-            var days = Math.round((date-today)/(24 * 60 * 60 * 1000))
+            var days = Math.round((date - today) / (24 * 60 * 60 * 1000))
             if (days > 0) {
-              return days + " day(s) remaining to complete";
+                return days + " day(s) remaining to complete";
             } else {
-              return "Must have been completed reading by " + days + " day(s)";
+                return "Must have been completed reading by " + days + " day(s)";
             }
         },
 
         stopLoading: function() {
             var self = this;
-            setTimeout( () => {
+            setTimeout(() => {
                 self.isLoading = false;
             }, 300)
         },
@@ -228,9 +226,9 @@ var app = new Vue({
                 return number + ' ' + (number > 1 ? 'Months' : 'Month')
             }
         },
-        
+
         viewAllLinks: function() {
-            window.open(this.domainUrl+'/inbox');
+            window.open(this.domainUrl + '/inbox');
         }
     }
 })

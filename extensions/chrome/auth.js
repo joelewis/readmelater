@@ -2,10 +2,10 @@ let params = new URLSearchParams(location.search);
 var token = params.get('token');
 
 
-chrome.storage.local.set({'jwt': token}, function(data) {
+browser.storage.local.set({ 'jwt': token }).then(function(data) {
     console.log(data);
     // close current tab
-    chrome.tabs.getCurrent(function(tab) {
-        chrome.tabs.remove(tab.id, function() { });
+    browser.tabs.query({ active: true, currentWindow: true }).then(function(tabs) {
+        browser.tabs.remove(tabs[0].id);
     });
 });

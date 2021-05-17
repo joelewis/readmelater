@@ -1,30 +1,30 @@
-// chrome.runtime.onStartup.addListener(function callback)
+// browser.runtime.onStartup.addListener(function callback)
 
-// chrome.runtime.onInstalled.addListener(function(details) {
+// browser.runtime.onInstalled.addListener(function(details) {
 //     alert('Hey')
-//     // chrome.storage.sync.set({clean_news_feed: true});
+//     // browser.storage.sync.set({clean_news_feed: true});
 // });
 
-// chrome.tabs.onSelectionChanged.addListener(function(tabId) {
-//     // chrome.browserAction.setIcon({ 
-//     //     path: 'twitter.png', 
+// browser.tabs.onSelectionChanged.addListener(function(tabId) {
+//     // browser.browserAction.setIcon({
+//     //     path: 'twitter.png',
 //     //     tabId: tabId
 //     // });
 
-//     // chrome.browserAction.setIcon({
-//     //     imageData: draw(i*2, i*4), 
+//     // browser.browserAction.setIcon({
+//     //     imageData: draw(i*2, i*4),
 //     //     tabId: tabId
 //     // });
 // });
-  
-// chrome.tabs.getSelected(null, function(tab) {
-//     chrome.browserAction.setIcon({
+
+// browser.tabs.getSelected(null, function(tab) {
+//     browser.browserAction.setIcon({
 //         imageData: draw(i*2, i*4), tabId: tab.id
 //     });
 // });
-  
-//   chrome.pageAction.onClicked.addListener(function(tab) {
-//       chrome.tabs.sendRequest(tab.id, {}, null);
+
+//   browser.pageAction.onClicked.addListener(function(tab) {
+//       browser.tabs.sendRequest(tab.id, {}, null);
 //   });
 
 function getJSON(url, headers) {
@@ -35,8 +35,8 @@ function getJSON(url, headers) {
         cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
         credentials: 'same-origin', // include, *same-origin, omit
         headers: {
-          'Content-Type': 'application/json'
-          // 'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json'
+            // 'Content-Type': 'application/x-www-form-urlencoded',
         },
         redirect: 'follow', // manual, *follow, error
         referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
@@ -46,34 +46,34 @@ function getJSON(url, headers) {
     Object.keys(headers).forEach(key => {
         opts.headers[key] = headers[key]
     });
-    
+
     return fetch(url, opts);
 }
 
 const ICON_IMG_URL = {
     BOOKMARKED: 'img/closetab-bookmarked.png',
     NOT_BOOKMARKED: 'img/closetab-not-bookmarked.png',
-    UNAUTHORIZED: 'img/closetab.png',
+    UNAUTHORIZED: 'img/closetab-logo.png',
 }
 
 var updateBrowserIcon = function(type, tabId) {
-    chrome.browserAction.setIcon({ 
-        path: ICON_IMG_URL[type], 
+    browser.browserAction.setIcon({
+        path: ICON_IMG_URL[type],
         tabId: tabId
     });
 }
 
-var checkAndUpdateBookmarkExtentionIcon = function(url, tabId) {
+var checkAndUpdateBookmarkExtensionIcon = function(url, tabId) {
     try {
-        chrome.storage.local.get('jwt', function(data) {
+        browser.storage.local.get('jwt').then(function(data) {
             if (data.jwt) {
-                getJSON(chrome.runtime.getManifest().domainUrl + `/is/bookmarked?href=${encodeURIComponent(url)}`, {'Authorization': 'Bearer ' + data.jwt}).then(function(r) {
+                getJSON(browser.runtime.getManifest().domainUrl + `/is/bookmarked?href=${encodeURIComponent(url)}`, { 'Authorization': 'Bearer ' + data.jwt }).then(function(r) {
                     if (r.status === 200) {
                         r.json().then(json => {
                             // bookmarked
                             updateBrowserIcon('BOOKMARKED', tabId)
                         })
-                    } else if (r.status === 401){
+                    } else if (r.status === 401) {
                         // unauthorized
                         updateBrowserIcon('UNAUTHORIZED', tabId)
                     } else {
@@ -85,37 +85,33 @@ var checkAndUpdateBookmarkExtentionIcon = function(url, tabId) {
                 // Login
                 updateBrowserIcon('UNAUTHORIZED', tabId)
             }
-          });
-    } catch(e) {
+        });
+    } catch (e) {
         // Login
         updateBrowserIcon('UNAUTHORIZED', tabId)
     }
 }
 
 // // listen to tab URL changes
-// chrome.tabs.onUpdated.addListener(checkAndUpdateBookmarkExtentionIcon);
+// browser.tabs.onUpdated.addListener(checkAndUpdateBookmarkExtensionIcon);
 
 // // listen to tab switching
-// chrome.tabs.onActivated.addListener(checkAndUpdateBookmarkExtentionIcon);
+// browser.tabs.onActivated.addListener(checkAndUpdateBookmarkExtensionIcon);
 
 // // listen for window switching
-// chrome.windows.onFocusChanged.addListener(checkAndUpdateBookmarkExtentionIcon);
+// browser.windows.onFocusChanged.addListener(checkAndUpdateBookmarkExtensionIcon);
 
-chrome.tabs.onSelectionChanged.addListener(function(tabId) {
-    chrome.windows.getCurrent(function(w) {
-        chrome.tabs.getSelected(w.id, function (response){
-            checkAndUpdateBookmarkExtentionIcon(response.url, tabId)
-        });
-    })
+browser.tabs.onActivated.addListener(function(activeInfo) {
+    browser.tabs.query({ active: true, currentWindow: true }).then(function(tabs) {
+        checkAndUpdateBookmarkExtensionIcon(tabs[0].url, activeInfo.tabId)
+    });
 })
 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+browser.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (changeInfo.status == 'complete' && tab.status == 'complete' && tab.url != undefined) {
-        chrome.windows.getCurrent(function(w) {
-            chrome.tabs.getSelected(w.id, function (response){
-                checkAndUpdateBookmarkExtentionIcon(response.url, tabId)
-            });
-        })
+        browser.tabs.query({ active: true, currentWindow: true }).then(function(tabs) {
+            checkAndUpdateBookmarkExtensionIcon(tabs[0].url, tabId)
+        });
     }
 })
 

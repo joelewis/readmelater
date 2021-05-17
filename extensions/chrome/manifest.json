@@ -1,13 +1,13 @@
 {
     "name": "Closetab.email",
     "description" : "Close your tabs with confidence. This extension will periodically remind you about your pending reading-list.",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "manifest_version": 2,
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "icons": {
-        "16": "img/closetab-logo.png",
-        "48": "img/closetab-logo.png",
+        "16": "img/closetab-logo_16x16.png",
+        "48": "img/closetab-logo_48x48.png",
         "128": "img/closetab-logo.png"
     },
 
@@ -18,10 +18,10 @@
     },
 
     "background": {
-        "scripts": ["background.js"],
+        "scripts": ["browser-polyfill.min.js", "background.js"],
         "persistent": false
     },
-    
+
     "permissions": [
         "storage",
         "tabs"

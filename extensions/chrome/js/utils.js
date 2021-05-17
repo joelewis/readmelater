@@ -17,7 +17,7 @@ function postJSON(url, json, headers) {
     Object.keys(headers).forEach(key => {
         opts.headers[key] = headers[key]
     });
-    
+
     return fetch(url, opts);
 }
 
@@ -39,10 +39,10 @@ function getReq(url, headers) {
     Object.keys(headers).forEach(key => {
         opts.headers[key] = headers[key]
     });
-    
+
     return fetch(url, opts);
 }
 
 function getDomainUrl() {
-    return chrome.runtime.getManifest().domainUrl;
+    return browser.runtime.getManifest().domainUrl;
 }
