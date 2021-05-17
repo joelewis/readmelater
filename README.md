@@ -37,6 +37,7 @@ The source code is released under MIT License.
 ## Contributors
 
 + [Karthikeyan](http://karthyk.dev) - Thank you for helping me develop the chrome extension and designing a quick UX for the inbox view!
++ [Alin Panaitiu](https://github.com/alin23) - Thank you for porting the extension to a version supported by most browsers!
 + [Joe Lewis](http://joe-lewis.com)  
 
 
