@@ -55,12 +55,9 @@
               </h5>
 
               <div>  
-                <q-btn icon="login" @click="loginWith('google')" unelevated rounded color="red" label="Sign-in Using Google" />
-                <q-btn type="a" href="https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb" target="__blank" class="q-ml-lg" icon="file_download" unelevated rounded color="dark" label="Install Chrome Extension" />
-                <q-btn icon="file_download" class="q-ml-lg" outline rounded :ripple="false" color="dark" label="Install Firefox Extension">
-                    <q-tooltip>
-                       Firefox extension is coming soon.
-                    </q-tooltip>
+                <q-btn icon="login" @click="loginWith('google')" rounded color="red" label="Sign-in Using Google" />
+                <q-btn type="a" href="https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb" target="__blank" class="q-ml-lg" icon="file_download" rounded color="dark" label="Add Chrome Extension" />
+                <q-btn type="a" href="https://addons.mozilla.org/en-US/firefox/addon/closetab-email/" target="__blank" icon="file_download" class="q-ml-lg" rounded :ripple="false" color="dark" label="Add Firefox Extension">
                 </q-btn>
                 <!-- <q-btn class="q-ml-lg" @click="loginWith('twitter')" unelevated rounded color="light-blue-14" label="Sign-in Using Twitter" /> -->
               </div>

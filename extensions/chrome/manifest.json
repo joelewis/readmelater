@@ -1,7 +1,7 @@
 {
     "name": "Closetab.email",
     "description" : "Close your tabs with confidence. This extension will periodically remind you about your pending reading-list.",
-    "version": "0.0.3",
+    "version": "1.0.0",
     "manifest_version": 2,
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
@@ -29,5 +29,5 @@
     "web_accessible_resources": [
         "login.html"
     ],
-    "domainUrl": "http://localhost:3000"
+    "domainUrl": "https://closetab.email"
 }
