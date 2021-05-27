@@ -1,6 +1,5 @@
 # Read Me Later
-Bookmark with a snooze button. Bookmark, buffer and complete your reading list. 
-
+A smarter bookmarking system to help you complete your reading list. If you want to use this right away: https://closetab.email
 
 ## Manifesto
 A good bookmark service should help me at two things: 
