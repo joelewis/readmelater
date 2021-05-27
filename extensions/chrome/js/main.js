@@ -121,7 +121,7 @@ var app = new Vue({
         getTags: function(jwt) {
             var self = this;
             self.stopLoading();
-            getReq(this.domainUrl + '/tags', { 'Authorization': 'Bearer ' + jwt }).then(resp => {
+            makeReq(this.domainUrl + '/tags', { 'Authorization': 'Bearer ' + jwt }, 'GET').then(resp => {
                 self.isLoading = false;
                 return resp.json()
             }).then(resp => {
@@ -157,6 +157,18 @@ var app = new Vue({
             })
         },
 
+
+        undoBookmark: function() {
+            console.log('undoing bookmark')
+            var self = this;
+            self.isLoading = true;
+            makeReq(browser.runtime.getManifest().domainUrl + `/bookmark`, { 'Authorization': 'Bearer ' + self.jwt }, 'DELETE', {links: [self.bookmark.id]}).then(function() {
+                updateBrowserIcon('NOT_BOOKMARKED', self.tabId)
+                self.isLoading = false;
+                window.close();
+            })
+        },
+
         initBookmark: function() {
             var self = this;
             browser.tabs.get(this.tabId).then(function(tab) {
@@ -169,7 +181,7 @@ var app = new Vue({
         getOrSaveBookmark: function(jwt, url) {
             var self = this;
             this.isLoading = true;
-            getReq(browser.runtime.getManifest().domainUrl + `/is/bookmarked?href=${encodeURIComponent(url)}`, { 'Authorization': 'Bearer ' + jwt }).then(r => {
+            makeReq(browser.runtime.getManifest().domainUrl + `/is/bookmarked?href=${encodeURIComponent(url)}`, { 'Authorization': 'Bearer ' + jwt }, 'GET').then(r => {
                 this.isLoading = false;
                 if (r.status === 200) {
                     // bookmark already exists, just update client data with server data
@@ -181,6 +193,7 @@ var app = new Vue({
                         self.tags = bookmark.tags;
                         self.currentPageBookmarked = true;
                         self.isExistingBookmark = true;
+                        self.bookmark.id = bookmark.id;
                     });
                     updateBrowserIcon('BOOKMARKED', self.tabId)
                 } else if (r.status === 401) {

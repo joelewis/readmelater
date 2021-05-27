@@ -55,10 +55,8 @@
               </h5>
 
               <div>  
-                <q-btn icon="login" @click="loginWith('google')" rounded color="red" label="Sign-in Using Google" />
-                <q-btn type="a" href="https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb" target="__blank" class="q-ml-lg" icon="file_download" rounded color="dark" label="Add Chrome Extension" />
-                <q-btn type="a" href="https://addons.mozilla.org/en-US/firefox/addon/closetab-email/" target="__blank" icon="file_download" class="q-ml-lg" rounded :ripple="false" color="dark" label="Add Firefox Extension">
-                </q-btn>
+                <q-btn icon="login" @click="loginWith('google')" unelevated rounded color="red" label="Sign-in Using Google" />
+                <q-btn icon="login" @click="loginWith('twitter')" unelevated class="q-ml-lg" rounded color="blue" label="Sign-in Using Twitter" />
                 <!-- <q-btn class="q-ml-lg" @click="loginWith('twitter')" unelevated rounded color="light-blue-14" label="Sign-in Using Twitter" /> -->
               </div>
 
@@ -67,6 +65,9 @@
                     Are you scared to close those extra tabs in your browser, afraid you might forget them forever?
                     Maybe it's a really long article or a group of related tabs from your recent research – now you can just <a href="#">#tag</a> them, <u>set a timeout</u> and CloseTab will make sure you finish consuming those tabs <u>in time</u>.
                 </p>
+
+                <q-btn type="a" href="https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb" target="__blank" class="" icon="file_download" outline  color="dark" label="Add Chrome Extension" />
+                <q-btn type="a" href="https://addons.mozilla.org/en-US/firefox/addon/closetab-email/" target="__blank" icon="file_download" class="q-ml-lg" outline  :ripple="false" color="dark" label="Add Firefox Extension" />
               </div>
 
               <div class="q-pt-lg">
@@ -128,7 +129,7 @@
             
           </div>
           <div class="col">
-            <div class="text-center text-caption q-mb-0">Crafted with ❤️ from Madras</div>
+            <div class="text-center text-caption q-mb-0">Crafted with ❤️ from Madras | <a href="https://twitter.com/vettijoe">Maker</a> | <a href="https://github.com/joelewis/readmelater">Source code</a></div>
           </div>
 
           <div class="col-lg-3 col-md-3 col-sm-1">

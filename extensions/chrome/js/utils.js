@@ -21,10 +21,10 @@ function postJSON(url, json, headers) {
     return fetch(url, opts);
 }
 
-function getReq(url, headers) {
+function makeReq(url, headers, method, body) {
     // Default options are marked with *
     var opts = {
-        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        method: method || 'GET', // *GET, POST, PUT, DELETE, etc.
         mode: 'cors', // no-cors, *cors, same-origin
         cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
         credentials: 'same-origin', // include, *same-origin, omit
@@ -34,6 +34,10 @@ function getReq(url, headers) {
         },
         redirect: 'follow', // manual, *follow, error
         referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    }
+
+    if (body) {
+        opts.body = JSON.stringify(body) 
     }
 
     Object.keys(headers).forEach(key => {

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import passport from 'passport';
 import PassportGoogleOauth from 'passport-google-oauth';
+import PassportTwitter from 'passport-twitter';
 import PassportJwt from 'passport-jwt';
 import session from "express-session";
 import connectSqlite3 from "connect-sqlite3"
@@ -26,7 +27,11 @@ var ExtractJwt = PassportJwt.ExtractJwt;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
+const TWITTER_CONSUMER_KEY = process.env.TWITTER_CONSUMER_KEY;
+const TWITTER_CONSUMER_SECRET = process.env.TWITTER_CONSUMER_SECRET;
+
 var GoogleStrategy = PassportGoogleOauth.OAuth2Strategy;
+var TwitterStrategy = PassportTwitter.Strategy;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -57,6 +62,37 @@ passport.use('google', new GoogleStrategy({
   callbackURL: process.env.DOMAIN_URL + "/auth/google/callback"
 },
   async function(accessToken, refreshToken, profile, done) {
+    var email = profile._json.email;
+    var name = profile._json.name;
+    // find user or create user with email obtained from google
+    const user = await u.getUserByEmail(email);
+
+    if (user) {
+      return done(null, user);
+    }
+
+    try {
+      // create user
+      const user = await prisma.user.create({
+        data: { email: email, name: name }
+      });
+      done(null, user)
+    } catch (e) {
+      done(e);
+    }
+  }
+));
+
+passport.use(new TwitterStrategy({
+    consumerKey: TWITTER_CONSUMER_KEY,
+    consumerSecret: TWITTER_CONSUMER_SECRET,
+    callbackURL: process.env.DOMAIN_URL + "/auth/twitter/callback",
+    userProfileURL: "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true",
+  },
+  async function(accessToken, refreshToken, profile, done) {
+
+    console.log(profile);
+
     var email = profile._json.email;
     var name = profile._json.name;
     // find user or create user with email obtained from google
@@ -182,7 +218,42 @@ app.get('/auth/google/callback',
       res.redirect(redirect || '/');
     }
 
-  });
+});
+
+// twitter auth
+app.get('/auth/twitter', (req, res, next) => {
+  // detect if login attempt comes from extension, if so get extension url and redirect to it with the jwt token
+  if (req.query.from_extension) {
+    req.session.from_extension = req.query.from_extension;
+  }
+  if (req.query.from_extension_url) {
+    req.session.from_extension_url = req.query.from_extension_url;
+  }
+  passport.authenticate('twitter')(req, res, next)
+});
+
+// twitter auth
+app.get('/auth/twitter/callback',
+  passport.authenticate('twitter', { failureRedirect: '/login' }),
+  function(req, res) {
+    const redirect = req.session.returnTo;
+    delete req.session.returnTo;
+
+    if (req.session.from_extension_url) {
+      var extension_url = `${req.session.from_extension_url}login.html`
+      delete req.session.from_extension_url
+      // redirect to extension's url with jwt token in get param
+      res.redirect(extension_url + '?token=' + jwt.sign({ id: req.user.id }, jwtSecret, { expiresIn: '7d' }));
+    } else if (req.session.from_extension) {
+      var extension_url = `chrome-extension://${req.session.from_extension}/login.html`
+      delete req.session.from_extension
+      // redirect to extension's url with jwt token in get param
+      res.redirect(extension_url + '?token=' + jwt.sign({ id: req.user.id }, jwtSecret, { expiresIn: '7d' }));
+    } else {
+      res.redirect(redirect || '/');
+    }
+
+});
 
 app.get('/token',
   ensureAuthAPI,
@@ -333,6 +404,10 @@ app.get('/deleteaccount', ensureAuthAPI, async (req, res) => {
 
 app.get('/privacy', (req, res) => {
   res.sendFile(path.join(__dirname + '/public/privacy.html'));
+})
+
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname + '/public/terms.html'));
 })
 
 

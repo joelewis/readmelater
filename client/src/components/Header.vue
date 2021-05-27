@@ -18,9 +18,10 @@
         </q-toolbar-title>
 
         <q-space />
-        <a href="https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb" class="q-pr-lg">Install chrome extension for quickly adding links </a>
+        <q-btn size="md" no-caps type="a" href="https://chrome.google.com/webstore/detail/closetabemail/lkgcnpldaonnbdnkiimgdjkecopjnbeb" target="__blank" class="" icon="file_download" outline  color="dark" label="Add Chrome Extension" />
+        <q-btn size="md" no-caps type="a" href="https://addons.mozilla.org/en-US/firefox/addon/closetab-email/" target="__blank" icon="file_download" class="q-ma-lg" outline  :ripple="false" color="dark" label="Add Firefox Extension" />
         <div class="q-gutter-sm row items-center no-wrap">
-          <q-btn bordered outline icon-right="expand_more" no-caps :label="user.name"
+          <q-btn outline icon-right="expand_more" no-caps :label="user.name"
            >
 
 
