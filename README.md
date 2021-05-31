@@ -6,7 +6,7 @@ A good bookmark service should help me at two things:
 1.  I've read something. I don't want to lose it.  
 2.  I don't have the time to read something at the moment. I want to buffer it and come back to it later.
 
-While good at #1, most suck at #2. A good bookmark service should help me complete my reading list than just being a dumb bucket. It should have three basic properties:
+While some of them are good at #1, most suck at #2. A good bookmark service should help me complete my reading list than just being a dumb bucket. This is what I expect:
 
 1. I should be able to bookmark a link with a timeout within which I'd like to read it.
 2. The service should remind me of pending items in my reading list.
@@ -39,6 +39,10 @@ The source code is released under MIT License.
 + [Alin Panaitiu](https://github.com/alin23) - Thank you for porting the extension to a version supported by most browsers!
 + [Joe Lewis](http://joe-lewis.com)  
 
+
+## Media
++ [Featured in Console: the open-source newsletter](https://console.substack.com/p/console-55?r=3cbez&utm_campaign=post&utm_medium=web&utm_source=copy) 
++ [Hacker News](https://news.ycombinator.com/item?id=27036764)
 
 ## Setup
 
