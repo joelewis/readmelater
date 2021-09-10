@@ -1,5 +1,7 @@
 # Read Me Later
-A smarter bookmarking system to help you complete your reading list. If you want to use this right away: https://closetab.email
+A smarter bookmarking system to help you complete your reading list. If you want to use this right away: https://closetab.email 
+
+*In loving memory of my friend [Karthik](https://github.com/karthikricssion) who helped me write some of the code for this project. He lost his battle against cancer but won the hearts of many with his cheerful smile, stupid jokes and by just being there for us whenever we needed him*
 
 ## Manifesto
 A good bookmark service should help me at two things: 
@@ -48,7 +50,7 @@ The source code is released under MIT License.
 4. `cp client/sample.env client/.env`
 5.  Edit .env files to configure database, auth keys and other configurations
 3. `DEBUG="*" npx prisma migrate dev --name init` to setup migration scripts and create tables. 
-4. `DEBUG="*" npx prisma generate` to create the tables. 
+4. `DEBUG="*" npx prisma generate` to create the tables. // we don't need this step in newer versions of prisma. `migrate` creates the client as well
 5. `cd client`
 6. `npm install` to install client project's dependencies
 7. `yarn build` to build client files and push into ../public folder

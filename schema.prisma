@@ -22,6 +22,8 @@ model Link {
   timeout     DateTime
   notify      Boolean  @default(true)
 
+  title       String?
+
   @@unique([userId, href])
 }
 
@@ -45,6 +47,11 @@ model User {
   Link      Link[]
   Tag       Tag[]
   EmailLog  EmailLog[]
+  twitterUsername       String?       @unique
+  stripeCustomerId      String?       @unique
+  paymentStatus         String        @default("unsubscribed")
+  pocketConnected       Boolean       @default(false)
+  pocketToken           PocketToken?
 }
 
 model EmailLog {
@@ -55,4 +62,11 @@ model EmailLog {
   userId    Int
   text      String
   html      String
+}
+
+model PocketToken {
+  id          Int      @id @default(autoincrement())
+  token       String?  @unique
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
 }

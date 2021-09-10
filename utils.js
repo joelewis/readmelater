@@ -2,6 +2,7 @@ import PrismaClient from '@prisma/client'
 import exphbs from 'express-handlebars';
 import AWS from 'aws-sdk';
 import jwt from 'jsonwebtoken';
+import axios from 'axios';
 
 const hbs = exphbs.create({});
 const prisma = new PrismaClient.PrismaClient();
@@ -22,6 +23,14 @@ export const getUserById = async (id) => {
     },
   });
 };
+
+export const getUserByStripeId = async (id) => {
+    return await prisma.user.findUnique({
+      where: {
+        stripeCustomerId: id,
+      },
+    });
+  };
 
 export const getTag = async (user, tag) => {
     return await prisma.tag.findUnique({
@@ -370,6 +379,60 @@ export const deleteAccount = async (user) => {
     });
 };
 
+export const fetchPocketBookmarksForLastWeek = async (user) => {
+    var since = new Date(); // points to today
+    since.setDate(since.getDate()-7); // now points to a week before
+
+    // convert to unix timestamp
+    since = Math.floor(since.getTime()/1000)
+
+    var params = {
+        consumer_key: process.env.POCKET_CONSUMER_KEY,
+        access_token: user.pocketToken.token,
+        tag: 'readlater',
+        since: since
+      };
+
+    try {
+        var response = await axios({
+            method: 'post',
+            url: 'https://getpocket.com/v3/get',
+            data: params,
+            headers: {
+              'X-Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
+        })
+
+        return Object.values(response.data.list);
+    } catch (e) {
+        console.log(`Error while fetching pocket links for user: ${user.id}`)
+        return []
+    }
+}
+
+export const collectPocketLinks = async () => {
+    var users = await prisma.user.findMany({
+        where: {
+            notify: true,
+            pocketConnected: true,
+            paymentStatus: 'subscribed'
+        },
+        include: {
+            pocketToken: true
+        }
+    })
+
+    var timeout = timeNow2Date('2w');
+
+    users.forEach(async user => {
+        var links = await fetchPocketBookmarksForLastWeek(user);
+        links.forEach(async pocketlink => {
+            var link = await addLink(user, pocketlink.given_url, timeout, []);
+        })
+    })
+}
+
 export const sendMails = async () => {
     // fetch users
     // for each user
@@ -460,12 +523,65 @@ export const sendMails = async () => {
     })
 }
 
+export const saveStripeId = async (user, customerId) => {
+    await prisma.user.update({
+        where: {id: user.id},
+        data: {stripeCustomerId: customerId}
+    })
+}
 
-// async deleteLink ({commit}, linkId) {
-//     try {
-//       var resp = await axios.delete('/bookmark', {id: linkId})
-//       commit('deleteLink', linkId);
-//     } catch (e) { 
-//       throw e;
-//     }
-//   },
+export const markUserAsPaid = async (user) => {
+    await prisma.user.update({
+        where: {id: user.id},
+        data: {paymentStatus: 'subscribed'}
+    })
+}
+
+export const deletePocketToken = async (user) => {
+    /**
+     * Ideally only one will exist, but prisma has made it so difficult to find out how to query for one unique
+     * token, so I'm using this findMany query to get a list of one :(
+     */
+    var pocketTokens = await prisma.pocketToken.findMany({
+        where: {userId: user.id}
+    })
+    if (pocketTokens.length) {
+        var pocketToken = pocketTokens[0];
+        await prisma.pocketToken.delete({
+            where: {id: pocketToken.id}
+        })
+
+        await prisma.user.update({
+            where: {
+                id: user.id
+            },
+            data: {
+                pocketConnected: false
+            }
+        })
+    }
+
+}
+
+export const savePocketToken = async (user, pocketToken) => {
+    // clear previous tokens if any
+    await deletePocketToken(user)
+
+
+    await prisma.pocketToken.create({
+        data: {
+            user: {
+                connect: {
+                    id: user.id
+                }
+            },
+
+            token: pocketToken
+        }
+    })
+
+    await prisma.user.update({
+        where: {id: user.id},
+        data: {pocketConnected: true}
+    })
+}

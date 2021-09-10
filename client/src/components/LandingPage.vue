@@ -125,14 +125,14 @@
         </div>
 
         <div class="row bg-red-1 q-pa-sm q-mt-xl">
-          <div class="col-lg-3 col-md-3 col-sm-1">
+          <div class="col-lg-2 col-md-2 col-sm-1">
             
           </div>
           <div class="col">
-            <div class="text-center text-caption q-mb-0">Crafted with ❤️ from Madras | <a href="https://twitter.com/vettijoe">Maker</a> | <a href="https://github.com/joelewis/readmelater">Source code</a></div>
+            <div class="text-center text-caption q-mb-0">In loving memory of my closest friend <a href="https://github.com/karthikricssion">Karthik</a> who wrote some of the code | <a href="https://twitter.com/vettijoe">Maker</a> | <a href="https://github.com/joelewis/readmelater">Source code</a> | Crafted with ❤️ from Madras </div>
           </div>
 
-          <div class="col-lg-3 col-md-3 col-sm-1">
+          <div class="col-lg-2 col-md-2 col-sm-1">
             
           </div>
         </div>

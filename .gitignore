@@ -9,6 +9,9 @@ sessions
 sessions.db
 public/**
 
+# remove when react-client is ready
+react-client 
+
 # C extensions
 *.so
 

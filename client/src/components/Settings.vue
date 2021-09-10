@@ -1,6 +1,6 @@
 <template>
     <q-page>
-       <div class="q-pa-md">
+       <div class="col-6 col-12-xs q-pa-md">
           <div class="row">
             <div class="col-6 col-12-xs q-gutter-sm">
               <q-checkbox color="red" v-model="unsubscribe" label="Stop sending me all email reminders" />
@@ -35,8 +35,64 @@
 
           <q-separator class="q-mt-lg" />
 
+          <div class="row q-pt-lg" v-if="user.paymentStatus === 'unsubscribed'">
+            <div class="col-6 col-12-xs q-gutter-sm">
+                <q-btn @click="createCheckoutSession" no-caps rounded unelevated color="red-10">Annual Membership&nbsp;<b style="font-size:1.2em;">$19.99/year</b></q-btn>
+                <p> Upgrade to a premium account to sync your <b>Pocket</b> bookmarks automatically. This way you can stay in your current bookmarking workflow and also reap the benefits of CloseTab. Just tag the link with <a href="#">#readlater</a> and it will be synced to <b>Closetab</b> automatically.</p>
+                <p> <a href="mailto:joe@closetab.email">Write to us if you want to sync with any other bookmarking services</a></p>
+
+                <q-btn no-caps rounded outline disabled color="red">Connect your Pocket Account</q-btn>
+                <p> Needs a premium subscription to activate</p>
+            </div>
+          </div>
+
+          <div class="row q-pt-lg" v-if="user.paymentStatus === 'subscribed'">
+            <div class="col-6 col-12-xs q-gutter-sm">
+              <q-banner inline-actions rounded class="bg-green-1 text-green-10">
+                <div>Congratulations! You have subscribed for premium features.</div>
+                <template v-slot:action>
+                  <q-btn @click="confirmUnsubscribe=true" no-caps rounded unelevated label="Unsubscribe" />
+                </template>
+              </q-banner>
+              <q-dialog v-model="confirmUnsubscribe" class="q-ma-lg">
+                <q-card>
+                  <q-card-section class="row items-center">
+                    <span class="q-ml-sm">Sad to see you go. You will not be charged anymore after unsubscribing. <b> Are you sure you want to unsubscribe?</b></span>
+                  </q-card-section>
+
+                  <q-card-actions align="right">
+                    <q-btn flat label="Cancel" color="primary" v-close-popup />
+                    <q-btn @click="unsubscribePremium" label="Yes, unsubscribe me" color="primary" v-close-popup />
+                  </q-card-actions>
+                </q-card>
+              </q-dialog>
+
+
+              <q-banner v-if="!user.pocketConnected" inline-actions rounded class="bg-cyan-1 text-cyan-10">
+                  <div>Connect your Pocket account. Once connected with your Pocket account, all the pocket links you tag with <b>"readlater"</b>, will automatically sync with your <b>CloseTab</b> account.</div>
+                  <template v-slot:action>
+                    <q-btn @click="connectPocket" no-caps rounded unelevated label="Connect Pocket Account" />
+                  </template>
+              </q-banner>
+              <template v-else>
+              <q-banner inline-actions rounded class="bg-cyan-1 text-cyan-10">
+                  <div>Connected with your Pocket Account.</div>
+                  <template v-slot:action>
+                    <q-btn @click="connectPocket" no-caps rounded unelevated label="Reconnect" />
+                  </template>
+              </q-banner>
+              <q-banner inline-actions rounded class="bg-orange-1 text-red-10">
+                  <div> When bookmarking a link with Pocket, tag it with <b>"readlater"</b>. Those bookmarks will be automatically bundled with your weekly digest. </div>  
+              </q-banner>
+              </template>
+                
+            </div>
+          </div>
+
+          <q-separator class="q-mt-lg" />
+
           <div class="col-6 col-12-xs q-gutter-sm">
-            <q-btn @click="confirmAccDelete = true" class="q-mt-lg q-ml-md" color="red"> Delete My Account </q-btn>
+            <q-btn @click="confirmAccDelete = true" class="q-mt-lg q-ml-md" color="red-10"> Delete My Account </q-btn>
             <q-dialog v-model="confirmAccDelete" class="q-ma-lg">
               <q-card>
                 <q-card-section class="row items-center">
@@ -60,11 +116,13 @@ export default {
     return {
       tags: [],
       tagOptions: [],
-      confirmAccDelete: false
+      confirmAccDelete: false,
+      confirmUnsubscribe: false
     }
   },
 
-  computed: { 
+  computed: {
+    ...mapState(['user']), 
     ...mapGetters(['unsubscribedTags']),
 
     unsubscribe: {
@@ -132,6 +190,35 @@ export default {
             self.tagOptions = self.tagOptions.filter(t => t.startsWith(val))
           }
         })
+    },
+
+    createCheckoutSession: function() {
+      var priceId = "price_1J4m9bSCpjxoLuKMuhf4EUK6";
+      return fetch("/start-payment-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          priceId: priceId
+        })
+      }).then(function(result) {
+        return result.json();
+      }).then(data => {
+        stripe.redirectToCheckout({
+          sessionId: data.sessionId
+        })
+      }).then(resp => {
+        console.log(data);
+      });
+    },
+
+    unsubscribePremium: function() {
+      console.log('call unsubscribe code');
+    },
+
+    connectPocket: function() {
+      window.location.href = '/auth/pocket'
     }
   }
 }

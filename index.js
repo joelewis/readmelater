@@ -15,13 +15,8 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import cron from 'node-cron';
 import * as u from './utils.js';
-
-dotenv.config();
-
-var SQLiteStore = connectSqlite3(session);
-
-var JWTstrategy = PassportJwt.Strategy;
-var ExtractJwt = PassportJwt.ExtractJwt;
+import Stripe from 'stripe';
+import axios from 'axios';
 
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -29,6 +24,20 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 const TWITTER_CONSUMER_KEY = process.env.TWITTER_CONSUMER_KEY;
 const TWITTER_CONSUMER_SECRET = process.env.TWITTER_CONSUMER_SECRET;
+
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET
+
+const POCKET_CONSUMER_KEY = process.env.POCKET_CONSUMER_KEY
+
+var stripe = Stripe(STRIPE_SECRET_KEY);
+
+dotenv.config();
+
+var SQLiteStore = connectSqlite3(session);
+
+var JWTstrategy = PassportJwt.Strategy;
+var ExtractJwt = PassportJwt.ExtractJwt;
 
 var GoogleStrategy = PassportGoogleOauth.OAuth2Strategy;
 var TwitterStrategy = PassportTwitter.Strategy;
@@ -45,7 +54,14 @@ app.use(session({
   store: new SQLiteStore()
 })); // import from env
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.json());
+// Use JSON parser for all non-webhook routes
+app.use((req, res, next) => {
+  if (req.originalUrl === '/stripe-webhook') {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors())
@@ -95,17 +111,30 @@ passport.use(new TwitterStrategy({
 
     var email = profile._json.email;
     var name = profile._json.name;
+    var username = profile.username;
     // find user or create user with email obtained from google
     const user = await u.getUserByEmail(email);
 
     if (user) {
+      // if not set already, add twitterUsername
+      if (!user.twitterUsername) { 
+        await prisma.user.update({
+          where: {
+            id: user.id
+          },
+          data: {
+            twitterUsername: username
+          }
+        })
+      }
+      // login the user
       return done(null, user);
     }
 
     try {
       // create user
       const user = await prisma.user.create({
-        data: { email: email, name: name }
+        data: { email: email, name: name, twitterUsername: username }
       });
       done(null, user)
     } catch (e) {
@@ -255,10 +284,67 @@ app.get('/auth/twitter/callback',
 
 });
 
+app.get('/auth/pocket', ensureAuthAPI, (req, res) => {
+  // obtain a request token
+  var params = {
+    consumer_key: POCKET_CONSUMER_KEY,
+    redirect_uri: process.env.DOMAIN_URL + '/auth/pocket/complete'
+  };
+  axios({
+    method: 'post',
+    url: 'https://getpocket.com/v3/oauth/request',
+    data: params,
+    headers: {
+      'X-Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  }).then(function(resp) {
+    req.session.pocketRequestCode = resp.data.code;
+    var redirectUrl = `https://getpocket.com/auth/authorize?request_token=${resp.data.code}&redirect_uri=${params.redirect_uri}`;
+    res.redirect(redirectUrl);
+  }).catch(err => {
+    console.log(err)
+    res.status(400).send()
+  })
+})
+
+app.get('/auth/pocket/complete', ensureAuthAPI, async (req, res) => { 
+  // convert request token into access token
+
+  if (!req.session.pocketRequestCode) {
+    res.status(400).send()
+  }
+
+  var params = {
+    consumer_key: POCKET_CONSUMER_KEY,
+    code: req.session.pocketRequestCode
+  }
+
+  axios({
+    method: 'post',
+    url: 'https://getpocket.com/v3/oauth/authorize',
+    data: params,
+    headers: {
+      'X-Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  }).then(async function(resp) {
+    delete req.session.pocketRequestCode;
+    var accessToken = resp.data.access_token;
+    // save user's access token
+    await u.savePocketToken(req.user, accessToken);
+    res.redirect('/settings')
+  }).catch(err => {
+    console.log(err)
+    res.status(400).send()
+  })
+
+})
+
 app.get('/token',
   ensureAuthAPI,
   function(req, res) {
-    var token = jwt.sign({ id: req.user.id }, jwtSecret, { expiresIn: '7d' });
+    var token = jwt.sign({ id: req.user.id }, jwtSecret, { expiresIn: '100d' });
     res.json({ token: token });
   })
 
@@ -418,10 +504,119 @@ app.get('/vote', (req, res) => {
   res.send('Thanks')
 })
 
+app.post('/stripe-webhook', express.raw({type: 'application/json'}), async (req, res) => {
+  let data;
+  let eventType;
+  // Check if webhook signing is configured.
+  const webhookSecret = STRIPE_WEBHOOK_SECRET;
+  console.log('secret: ', webhookSecret);
+  // Retrieve the event by verifying the signature using the raw body and secret.
+  let event;
+  let signature = req.headers["stripe-signature"];
+  console.log('signature: ', signature);
+
+  // var rawBody = JSON.stringify(req.body)
+  console.log('body: ', req.body);
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      webhookSecret
+    );
+  } catch (err) {
+    console.error(err);
+    console.log(`Webhook signature verification failed.`);
+    return res.sendStatus(400);
+  }
+  // Extract the object from the event.
+  data = event.data;
+  eventType = event.type;
+  console.log(eventType, data);
+  switch (eventType) {
+      case 'checkout.session.completed':
+        // Payment is successful and the subscription is created.
+        // We should provision the subscription and save the customer ID to our database.
+        var user = await u.getUserByStripeId(data.object.customer);
+        await u.markUserAsPaid(user);
+        break;
+      case 'invoice.paid':
+        // Continue to provision the subscription as payments continue to be made.
+        // Store the status in our database and check when a user accesses our service.
+        // This approach helps us avoid hitting rate limits.
+        var user = await u.getUserByStripeId(data.object.customer);
+        await u.markUserAsPaid(user);
+        break;
+      case 'invoice.payment_failed':
+        // The payment failed or the customer does not have a valid payment method.
+        // The subscription becomes past_due. Notify our customer and send them to the
+        // customer portal to update their payment information.
+
+        // no op for now. Let users avail the service even if subsequent renewals fail.
+        break;
+      default:
+      // Unhandled event type
+    }
+
+  res.sendStatus(200);
+})
+
+// payments related page
+app.post('/start-payment-session', ensureAuthAPI, async (req, res) => {
+  const { priceId } = req.body;
+  // create stripe customer if not already created. Will help us match with the webhook event
+
+  var customerId = req.user.stripeCustomerId;
+  if (!customerId) {
+    const customer = await stripe.customers.create({
+      email: req.user.email
+    });
+    customerId = customer.id;
+    await u.saveStripeId(req.user, customerId);
+  }
+
+  // now create checkout session
+  try {
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1
+        },
+      ],
+      // {CHECKOUT_SESSION_ID} is a string literal; do not change it!
+      // the actual Session ID is returned in the query parameter when your customer
+      // is redirected to the success page.
+      success_url: process.env.DOMAIN_URL + '/payment-success.html?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: process.env.DOMAIN_URL + '/payment-canceled.html',
+    });
+
+    res.send({
+      sessionId: session.id,
+    });
+  } catch (e) {
+    res.status(400);
+    return res.send({
+      error: {
+        message: e.message,
+      }
+    });
+  }
+
+});
+
 // render home page
 app.get('/*', async (req, res) => {
   res.sendFile(path.join(__dirname + '/public/index.html'));
 })
+
+app.get('/app', async (req, res) => {
+  res.sendFile(path.join(__dirname + '/react-public/index.html'));
+})
+
 
 // start cron job
 console.log('--------------------------------------');
@@ -430,7 +625,11 @@ console.log('--------------------------------------');
 cron.schedule('0 7 * * 1', function() {
   console.log('Running Cron Job -- sending emails');
   u.sendMails();
+  u.collectPocketLinks();
 });
+
+
+
 
 
 app.listen(port, '0.0.0.0', () => console.log(`Listening at http://localhost:${port}`))

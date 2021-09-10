@@ -50,6 +50,11 @@ let routes = [
         component: Settings
     },
     {
+        path: '/settings/payment-success',
+        name: 'settings',
+        component: Settings
+    },
+    {
         path: '/tags',
         name: 'tags',
         component: Tags
