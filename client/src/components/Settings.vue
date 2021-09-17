@@ -1,8 +1,12 @@
 <template>
     <q-page>
        <div class="col-6 col-12-xs q-pa-md">
+
           <div class="row">
             <div class="col-6 col-12-xs q-gutter-sm">
+              <q-banner v-show="showPaymentProcessingBanner" inline-actions rounded class="bg-green-1 text-green-10">
+                    <div>Thank you! It might take a short while to process the payment and reflect the status here. Until then this page may show up as an unsubscribed user. If it doesn't reflect within a few minutes, <a href="mailto:joe@closetab.email">write to us</a> and we'll quickly sort it out.</div>
+              </q-banner>
               <q-checkbox color="red" v-model="unsubscribe" label="Stop sending me all email reminders" />
             </div>
           </div>
@@ -51,10 +55,12 @@
               <q-banner inline-actions rounded class="bg-green-1 text-green-10">
                 <div>Congratulations! You have subscribed for premium features.</div>
                 <template v-slot:action>
-                  <q-btn @click="confirmUnsubscribe=true" no-caps rounded unelevated label="Unsubscribe" />
+                  <form method="POST" action="/create-customer-portal-session">
+                    <q-btn type="submit" @click="redirectToBillingPortal" no-caps rounded unelevated label="Manage Billing" />
+                  </form>
                 </template>
               </q-banner>
-              <q-dialog v-model="confirmUnsubscribe" class="q-ma-lg">
+              <!-- <q-dialog v-model="confirmUnsubscribe" class="q-ma-lg">
                 <q-card>
                   <q-card-section class="row items-center">
                     <span class="q-ml-sm">Sad to see you go. You will not be charged anymore after unsubscribing. <b> Are you sure you want to unsubscribe?</b></span>
@@ -65,7 +71,7 @@
                     <q-btn @click="unsubscribePremium" label="Yes, unsubscribe me" color="primary" v-close-popup />
                   </q-card-actions>
                 </q-card>
-              </q-dialog>
+              </q-dialog> -->
 
 
               <q-banner v-if="!user.pocketConnected" inline-actions rounded class="bg-cyan-1 text-cyan-10">
@@ -117,7 +123,8 @@ export default {
       tags: [],
       tagOptions: [],
       confirmAccDelete: false,
-      confirmUnsubscribe: false
+      confirmUnsubscribe: false,
+      showPaymentProcessingBanner: false
     }
   },
 
@@ -150,6 +157,11 @@ export default {
   },
 
   created: async function() {
+
+    if (this.$route.name === 'paymentsuccess') {
+      this.showPaymentProcessingBanner = true;
+    }
+
       try {
         await this.$store.dispatch('fetchTags')
         this.tagOptions = this.$store.state.tags.map(t => t.tag);
@@ -215,6 +227,10 @@ export default {
 
     unsubscribePremium: function() {
       console.log('call unsubscribe code');
+    },
+
+    redirectToBillingPortal: function() {
+
     },
 
     connectPocket: function() {

@@ -504,6 +504,10 @@ app.get('/vote', (req, res) => {
   res.send('Thanks')
 })
 
+// app.get('/downgrade', ensureAuthAPI, async (req, res) => {
+// SINCE WE HAVE STRIPE PROVIDING US WITH A NICE BILLING SELF SERVICE PORTAL, WE SHOULDN'T NEED THIS
+// })
+
 app.post('/stripe-webhook', express.raw({type: 'application/json'}), async (req, res) => {
   let data;
   let eventType;
@@ -554,6 +558,10 @@ app.post('/stripe-webhook', express.raw({type: 'application/json'}), async (req,
 
         // no op for now. Let users avail the service even if subsequent renewals fail.
         break;
+      case  'customer.subscription.deleted':
+        var user = await u.getUserByStripeId(data.object.customer);
+        await u.markUserAsUnpaid(user);
+        
       default:
       // Unhandled event type
     }
@@ -590,8 +598,8 @@ app.post('/start-payment-session', ensureAuthAPI, async (req, res) => {
       // {CHECKOUT_SESSION_ID} is a string literal; do not change it!
       // the actual Session ID is returned in the query parameter when your customer
       // is redirected to the success page.
-      success_url: process.env.DOMAIN_URL + '/payment-success.html?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: process.env.DOMAIN_URL + '/payment-canceled.html',
+      success_url: process.env.DOMAIN_URL + '/settings/payment-success?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: process.env.DOMAIN_URL + '/settings',
     });
 
     res.send({
@@ -607,6 +615,16 @@ app.post('/start-payment-session', ensureAuthAPI, async (req, res) => {
   }
 
 });
+
+app.post('/create-customer-portal-session', ensureAuthAPI, async (req, res) => {
+  var customerId = req.user.stripeCustomerId;
+  const session = await stripe.billingPortal.sessions.create({
+    customer: customerId,
+    return_url: process.env.DOMAIN_URL + '/settings',
+  });
+
+  res.redirect(session.url);
+})
 
 // render home page
 app.get('/*', async (req, res) => {

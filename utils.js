@@ -537,6 +537,13 @@ export const markUserAsPaid = async (user) => {
     })
 }
 
+export const markUserAsUnpaid = async (user) => {
+    await prisma.user.update({
+        where: {id: user.id},
+        data: {paymentStatus: 'unsubscribed'}
+    })
+}
+
 export const deletePocketToken = async (user) => {
     /**
      * Ideally only one will exist, but prisma has made it so difficult to find out how to query for one unique

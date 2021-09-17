@@ -51,7 +51,7 @@ let routes = [
     },
     {
         path: '/settings/payment-success',
-        name: 'settings',
+        name: 'paymentsuccess',
         component: Settings
     },
     {
